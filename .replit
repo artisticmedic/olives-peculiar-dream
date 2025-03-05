@@ -12,3 +12,14 @@ channel = "stable-23_05"
 [[ports]]
 localPort = 5900
 externalPort = 80
+
+[workflows]
+runButton = "Run Game"
+
+[[workflows.workflow]]
+name = "Run Game"
+author = 39646444
+
+[[workflows.workflow.tasks]]
+task = "shell.exec"
+args = "python main.py"
