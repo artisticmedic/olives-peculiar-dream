@@ -5,7 +5,7 @@ A fun 2D platformer game created with Pygame featuring a cat on a quest to colle
 
 ## Game Overview
 
-In "Olive's Peculiar Dream," you control a cat character who must navigate platforms, collect kibble, and reach the special toy at the top of the level.
+In "Olive's Peculiar Dream," you control a cat character who must navigate platforms, collect kibble, and find a special toy near the end of the level.
 
 ## Game Controls
 
@@ -69,7 +69,7 @@ The code is organized into these main directories:
 
 ## Game Objective
 
-Navigate your cat character through the platforms, collect all the kibble, and find the special toy at the top of the level for a pleasant surprise!
+Navigate your cat character through the platforms, collect all the kibble, and find a special toy near the end of the level!
 
 ## Development Notes
 
