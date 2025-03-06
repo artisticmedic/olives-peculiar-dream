@@ -863,10 +863,17 @@ while True:
             pygame.draw.rect(confetti_button_base, (r, g, b), 
                             (x, y, size, size))
 
-        # Apply button base to screen
-        DISPLAYSURF.blit(confetti_button_base, confetti_button)
+        # Create a smaller surface for the content (2px smaller on each side)
+        inner_button = pygame.Rect(
+            confetti_button.x + 2, 
+            confetti_button.y + 2, 
+            confetti_button.width - 4, 
+            confetti_button.height - 4
+        )
+        # Apply button base to screen (within borders)
+        DISPLAYSURF.blit(confetti_button_base, inner_button)
 
-        # Add button border
+        # Add button border after content
         pygame.draw.rect(DISPLAYSURF, WHITE, confetti_button, width=2, border_radius=10)
 
         # Create animated confetti button text
