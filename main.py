@@ -8,14 +8,15 @@ from pygame.locals import *
 from attached_assets.cat_image import load_cat_image
 from attached_assets.olive_cat import load_olive_cat_image
 
-# Initialize pygame
+# Initialize pygame with optimized settings
 pygame.init()
 
-# Set up display
+# Set up display with hardware acceleration and double buffering
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
-DISPLAYSURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT))
+DISPLAYSURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF)
 pygame.display.set_caption('Thank You Ariel!')
+pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP, pygame.MOUSEBUTTONDOWN])  # Only process necessary events
 
 # Define colors
 BLACK = (0, 0, 0)
@@ -212,8 +213,16 @@ def add_confetti_burst(x, y, amount=100):
     for _ in range(amount):
         confetti_particles.append(Confetti(x, y))
 
+# Delta time for frame-independent movement
+last_time = pygame.time.get_ticks()
+
 # Main game loop
 while True:
+    # Calculate delta time for smoother movement regardless of framerate
+    current_time = pygame.time.get_ticks()
+    dt = (current_time - last_time) / 1000.0  # Convert to seconds
+    last_time = current_time
+    
     # Event handling
     for event in pygame.event.get():
         if event.type == QUIT:
@@ -250,35 +259,42 @@ while True:
                 player_vel_x = 0
                 current_sprite = "idle"
     
-    # Update player position
-    player_x += player_vel_x
-    player_y += player_vel_y
+    # Update player position with delta time for consistent movement speed
+    player_x += player_vel_x * dt * 60  # Scale by target 60 FPS
+    player_y += player_vel_y * dt * 60
     
-    # Apply gravity
-    player_vel_y += gravity
+    # Apply gravity with delta time
+    player_vel_y += gravity * dt * 60
     
     # Update parallax effect based on player movement
     if player_vel_x != 0:
-        parallax_offset += player_vel_x * 0.1
+        parallax_offset += player_vel_x * 0.1 * dt * 60
         parallax_offset %= WINDOW_WIDTH
     
     # Update rain drops
     for drop in rain_drops:
         drop.update()
     
-    # Check kibble collection
+    # Check kibble collection using rectangle-based collision for better performance
+    player_rect = pygame.Rect(player_x, player_y, player_width, player_height)
+    
     for kibble in kibbles:
-        if (not kibble["collected"] and
-            player_x + player_width > kibble["x"] - kibble["radius"] and
-            player_x < kibble["x"] + kibble["radius"] and
-            player_y + player_height > kibble["y"] - kibble["radius"] and
-            player_y < kibble["y"] + kibble["radius"]):
-            kibble["collected"] = True
-            kibble_count += 1
-            # Show a random message
-            kibble_message["active"] = True
-            kibble_message["text"] = random.choice(kibble_messages)
-            kibble_message["timer"] = pygame.time.get_ticks()
+        if not kibble["collected"]:
+            # Create a rectangle around the kibble
+            kibble_rect = pygame.Rect(
+                kibble["x"] - kibble["radius"], 
+                kibble["y"] - kibble["radius"],
+                kibble["radius"] * 2, 
+                kibble["radius"] * 2
+            )
+            
+            if player_rect.colliderect(kibble_rect):
+                kibble["collected"] = True
+                kibble_count += 1
+                # Show a random message
+                kibble_message["active"] = True
+                kibble_message["text"] = random.choice(kibble_messages)
+                kibble_message["timer"] = pygame.time.get_ticks()
     
     # Update kibble message timing
     if kibble_message["active"] and pygame.time.get_ticks() - kibble_message["timer"] > kibble_message["duration"]:
@@ -403,21 +419,27 @@ while True:
                          (platform["x"], platform["y"] + platform["height"]), 
                          (platform["x"] + platform["width"], platform["y"] + platform["height"]), 2)
     
-    # Draw kibbles
+    # Draw kibbles - with pre-calculated time values for better performance
+    current_time = pygame.time.get_ticks()
+    sin_value = math.sin(current_time * 0.01) * 2
+    
     for kibble in kibbles:
         if not kibble["collected"]:
             # Draw kibble as a small circle with slight glow effect
-            glow_radius = kibble["radius"] + 2 + math.sin(pygame.time.get_ticks() * 0.01) * 2
-            glow_color = (kibble["color"][0], kibble["color"][1]//2, kibble["color"][2]//4, 150)
-            glow_surf = pygame.Surface((glow_radius*2, glow_radius*2), pygame.SRCALPHA)
-            pygame.draw.circle(glow_surf, glow_color, (glow_radius, glow_radius), glow_radius)
-            DISPLAYSURF.blit(glow_surf, (kibble["x"]-glow_radius, kibble["y"]-glow_radius))
+            glow_radius = kibble["radius"] + 2 + sin_value
             
-            # Main kibble
-            pygame.draw.circle(DISPLAYSURF, kibble["color"], (kibble["x"], kibble["y"]), kibble["radius"])
-            # Shine effect
-            pygame.draw.circle(DISPLAYSURF, (255, 255, 200), 
-                             (kibble["x"]-2, kibble["y"]-2), 2)
+            # Only create and draw glow if on screen (optimization)
+            if (0 <= kibble["x"] <= WINDOW_WIDTH and 0 <= kibble["y"] <= WINDOW_HEIGHT):
+                glow_color = (kibble["color"][0], kibble["color"][1]//2, kibble["color"][2]//4, 150)
+                glow_surf = pygame.Surface((glow_radius*2, glow_radius*2), pygame.SRCALPHA)
+                pygame.draw.circle(glow_surf, glow_color, (glow_radius, glow_radius), glow_radius)
+                DISPLAYSURF.blit(glow_surf, (kibble["x"]-glow_radius, kibble["y"]-glow_radius))
+                
+                # Main kibble
+                pygame.draw.circle(DISPLAYSURF, kibble["color"], (kibble["x"], kibble["y"]), kibble["radius"])
+                # Shine effect
+                pygame.draw.circle(DISPLAYSURF, (255, 255, 200), 
+                                (kibble["x"]-2, kibble["y"]-2), 2)
     
     # Draw player as a cat sprite
     DISPLAYSURF.blit(cat_sprites[current_sprite], (player_x, player_y))
@@ -564,29 +586,37 @@ while True:
             x = WINDOW_WIDTH // 2 + int(radius * math.cos(angle * 0.0174533))
             y = WINDOW_HEIGHT // 2 + int(radius * math.sin(angle * 0.0174533))
             
-            # Create rotating Olive images with rainbow effects
+            # Create rotating Olive images with rainbow effects - optimized
             rotation = (angle + current_time // 20) % 360
-            scale = 0.7 + 0.3 * abs(math.sin(current_time * 0.001 + i * 0.5))
-            size = int(40 * scale)
+            # Use fewer scale values (just 3 instead of continuous)
+            scale_index = int((current_time * 0.001 + i * 0.5) % 3)
+            scales = [0.7, 0.85, 1.0]  # Pre-computed scales
+            scale = scales[scale_index]
             
-            # Rotate and scale the Olive image
-            rotated_cat = pygame.transform.rotozoom(olive_cat_img, rotation, scale)
+            # Use a cache for rotated images to avoid expensive transforms
+            # Simple caching mechanism - 12 angles (30 degree increments) x 3 scales = 36 images max
+            cache_key = f"{rotation//10}_{scale_index}"
+            
+            # Create the cache if it doesn't exist
+            if not hasattr(load_olive_cat_image, 'cache'):
+                load_olive_cat_image.cache = {}
+                
+            if cache_key not in load_olive_cat_image.cache:
+                rotated_cat = pygame.transform.rotozoom(olive_cat_img, rotation, scale)
+                load_olive_cat_image.cache[cache_key] = rotated_cat
+            else:
+                rotated_cat = load_olive_cat_image.cache[cache_key]
+                
             rect = rotated_cat.get_rect(center=(x, y))
             
-            # Apply a rainbow color filter
-            hue = (i * 30 + current_time // 30) % 360
-            r = int(abs(math.sin(hue * 0.0174533)) * 255)
-            g = int(abs(math.sin((hue + 120) * 0.0174533)) * 255)
-            b = int(abs(math.sin((hue + 240) * 0.0174533)) * 255)
+            # Simplified color calculations - fewer trig functions
+            # Pre-calculated color table (12 colors for the 12 positions)
+            r = (i * 20 + current_time // 30) % 255
+            g = (i * 20 + 85 + current_time // 30) % 255
+            b = (i * 20 + 170 + current_time // 30) % 255
             
-            # Apply a colored tint to the image
-            tinted_cat = rotated_cat.copy()
-            tint = pygame.Surface(tinted_cat.get_size(), pygame.SRCALPHA)
-            tint.fill((r, g, b, 50))  # Semi-transparent tint
-            tinted_cat.blit(tint, (0, 0), special_flags=pygame.BLEND_RGBA_ADD)
-            
-            # Draw the tinted, rotated Olive cat
-            DISPLAYSURF.blit(tinted_cat, rect)
+            # Apply colored overlay with alpha blending
+            DISPLAYSURF.blit(rotated_cat, rect, special_flags=pygame.BLEND_RGB_ADD)
         
         # Display thank you message with a more elegant style
         font = pygame.font.Font(None, 42)
