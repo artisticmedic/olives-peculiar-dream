@@ -176,21 +176,40 @@ class Confetti:
     def __init__(self, x, y):
         self.x = x
         self.y = y
-        self.size = random.randint(5, 10)
-        self.color = (
-            random.randint(100, 255),
-            random.randint(100, 255),
-            random.randint(100, 255)
-        )
-        self.speed_x = random.uniform(-3, 3)
-        self.speed_y = random.uniform(-8, -4)
+        self.type = random.choice(["square", "ribbon", "circle", "star"])
+        self.size = random.randint(6, 12)  # Larger size
+        
+        # More vibrant colors
+        bright_colors = [
+            (255, 0, 0),      # Red
+            (255, 165, 0),    # Orange
+            (255, 255, 0),    # Yellow
+            (0, 255, 0),      # Green
+            (0, 255, 255),    # Cyan
+            (0, 0, 255),      # Blue
+            (255, 0, 255),    # Magenta
+            (255, 20, 147),   # Pink
+            (255, 215, 0),    # Gold
+            (138, 43, 226)    # Purple
+        ]
+        self.color = random.choice(bright_colors)
+        
+        self.speed_x = random.uniform(-4, 4)  # More horizontal movement
+        self.speed_y = random.uniform(-10, -5)  # Higher initial velocity
         self.rotation = random.uniform(0, 360)
-        self.rotation_speed = random.uniform(-5, 5)
-        self.gravity = random.uniform(0.1, 0.3)
-        self.lifetime = 100 + random.randint(0, 100)
+        self.rotation_speed = random.uniform(-8, 8)  # Faster rotation
+        self.gravity = random.uniform(0.1, 0.25)
+        self.lifetime = 150 + random.randint(0, 100)  # Longer lifetime
+        self.wave_offset = random.uniform(0, 2 * math.pi)  # For ribbon movement
+        self.wave_speed = random.uniform(0.05, 0.15)
         
     def update(self):
         self.x += self.speed_x
+        
+        # Add some waviness to ribbons
+        if self.type == "ribbon":
+            self.x += math.sin(self.wave_offset + pygame.time.get_ticks() * self.wave_speed) * 0.5
+        
         self.y += self.speed_y
         self.speed_y += self.gravity
         self.rotation += self.rotation_speed
@@ -199,10 +218,41 @@ class Confetti:
     def draw(self, surface):
         if self.lifetime <= 0:
             return False
+        
+        # Calculate alpha for fade out near end of lifetime
+        alpha = min(255, self.lifetime * 2)
+        
+        # Create a rotated shape based on type
+        confetti_surf = pygame.Surface((self.size * 2, self.size * 2), pygame.SRCALPHA)
+        
+        if self.type == "square":
+            # Square confetti
+            pygame.draw.rect(confetti_surf, self.color + (alpha,), (self.size/2, self.size/2, self.size, self.size))
             
-        # Create a rotated rectangle for the confetti
-        confetti_surf = pygame.Surface((self.size, self.size), pygame.SRCALPHA)
-        pygame.draw.rect(confetti_surf, self.color, (0, 0, self.size, self.size))
+        elif self.type == "ribbon":
+            # Ribbon (longer rectangle)
+            ribbon_length = self.size * 4
+            pygame.draw.rect(confetti_surf, self.color + (alpha,), 
+                            (self.size/2, self.size - ribbon_length/2, self.size/2, ribbon_length))
+            
+        elif self.type == "circle":
+            # Circle confetti
+            pygame.draw.circle(confetti_surf, self.color + (alpha,), (self.size, self.size), self.size/2)
+            
+        elif self.type == "star":
+            # Star confetti (simplified)
+            points = []
+            for i in range(5):
+                # Outer points
+                angle = math.pi * 2 * i / 5 - math.pi / 2
+                points.append((self.size + math.cos(angle) * self.size, 
+                               self.size + math.sin(angle) * self.size))
+                # Inner points
+                angle += math.pi / 5
+                points.append((self.size + math.cos(angle) * (self.size/2), 
+                               self.size + math.sin(angle) * (self.size/2)))
+            pygame.draw.polygon(confetti_surf, self.color + (alpha,), points)
+        
         rotated = pygame.transform.rotate(confetti_surf, self.rotation)
         rect = rotated.get_rect(center=(self.x, self.y))
         surface.blit(rotated, rect)
@@ -550,30 +600,30 @@ while True:
         container_x = (WINDOW_WIDTH - container_width) // 2
         container_y = (WINDOW_HEIGHT - container_height) // 2
         
-        # Draw container with a skeuomorphic look
-        pygame.draw.rect(DISPLAYSURF, (80, 80, 100), 
+        # Draw container shadow first (pure black with offset)
+        pygame.draw.rect(DISPLAYSURF, (0, 0, 0), 
+                         (container_x + 4, container_y + 4, container_width, container_height), 
+                         border_radius=30)  # More rounded corners
+        
+        # Draw container with a skeuomorphic look (on top of shadow)
+        pygame.draw.rect(DISPLAYSURF, (85, 85, 105), 
                          (container_x, container_y, container_width, container_height), 
-                         border_radius=20)
+                         border_radius=30)  # More rounded corners
         
-        # Add a highlight effect at the top and left edges
-        pygame.draw.line(DISPLAYSURF, (100, 100, 120), 
-                        (container_x + 5, container_y + 5), 
-                        (container_x + container_width - 5, container_y + 5), 
-                        3)
-        pygame.draw.line(DISPLAYSURF, (100, 100, 120), 
-                        (container_x + 5, container_y + 5), 
-                        (container_x + 5, container_y + container_height - 5), 
-                        3)
+        # Add a highlight effect at the top and left edges (softer glow)
+        pygame.draw.line(DISPLAYSURF, (110, 110, 130), 
+                        (container_x + 15, container_y + 15), 
+                        (container_x + container_width - 15, container_y + 15), 
+                        4)
+        pygame.draw.line(DISPLAYSURF, (110, 110, 130), 
+                        (container_x + 15, container_y + 15), 
+                        (container_x + 15, container_y + container_height - 15), 
+                        4)
         
-        # Add a shadow effect at the bottom and right edges
-        pygame.draw.line(DISPLAYSURF, (60, 60, 80), 
-                        (container_x + 5, container_y + container_height - 5), 
-                        (container_x + container_width - 5, container_y + container_height - 5), 
-                        3)
-        pygame.draw.line(DISPLAYSURF, (60, 60, 80), 
-                        (container_x + container_width - 5, container_y + 5), 
-                        (container_x + container_width - 5, container_y + container_height - 5), 
-                        3)
+        # Add an inner border glow
+        pygame.draw.rect(DISPLAYSURF, (100, 100, 120), 
+                        (container_x + 8, container_y + 8, container_width - 16, container_height - 16), 
+                        width=2, border_radius=25)
         
         # Draw Olive cat images as decorative elements around the container
         current_time = pygame.time.get_ticks()
@@ -620,18 +670,18 @@ while True:
         
         # Display thank you message with a more elegant style
         font = pygame.font.Font(None, 42)
-        shadow_offset = 2
+        shadow_offset = 4  # Increased shadow offset
         
         lines = [
             "Ariel,",
-            "thank you for being an incredible",
+            "Thank you for being an incredible",  # Capitalized T
             "team member (and for bringing",
             "Olive to all of our meetings)."
         ]
         
         for i, line in enumerate(lines):
-            # Draw text shadow
-            shadow_text = font.render(line, True, (30, 30, 30))
+            # Draw text shadow with pure black, no alpha
+            shadow_text = font.render(line, True, (0, 0, 0))
             shadow_rect = shadow_text.get_rect(center=(WINDOW_WIDTH // 2 + shadow_offset, container_y + 120 + i * 45 + shadow_offset))
             DISPLAYSURF.blit(shadow_text, shadow_rect)
             
@@ -639,6 +689,59 @@ while True:
             text = font.render(line, True, WHITE)
             text_rect = text.get_rect(center=(WINDOW_WIDTH // 2, container_y + 120 + i * 45))
             DISPLAYSURF.blit(text, text_rect)
+            
+        # Add sparkle effects around container corners
+        current_time = pygame.time.get_ticks()
+        
+        # Define sparkle positions (corners of container)
+        sparkle_positions = [
+            (container_x + 20, container_y + 20),  # Top-left
+            (container_x + container_width - 20, container_y + 20),  # Top-right
+            (container_x + 20, container_y + container_height - 20),  # Bottom-left
+            (container_x + container_width - 20, container_y + container_height - 20),  # Bottom-right
+            # Add a few more random positions along the edges
+            (container_x + container_width // 2, container_y + 15),  # Top middle
+            (container_x + container_width // 2, container_y + container_height - 15),  # Bottom middle
+            (container_x + 15, container_y + container_height // 2),  # Left middle
+            (container_x + container_width - 15, container_y + container_height // 2)  # Right middle
+        ]
+        
+        # Draw sparkles with fade in/out effect
+        for pos in sparkle_positions:
+            # Calculate size and opacity based on time (pulsing effect)
+            time_factor = (current_time / 200 + sparkle_positions.index(pos) * 0.5) % 1.0
+            # Create sine wave between 0 and 1
+            fade = (math.sin(time_factor * 2 * math.pi) + 1) / 2
+            
+            # Only draw visible sparkles
+            if fade > 0.1:
+                size = int(4 + fade * 4)  # Size between 4 and 8
+                alpha = int(fade * 255)  # Alpha between 0 and 255
+                
+                # Draw a simple sparkle shape
+                sparkle_surf = pygame.Surface((size * 4, size * 4), pygame.SRCALPHA)
+                
+                # Cross shape
+                pygame.draw.line(sparkle_surf, (255, 255, 200, alpha), 
+                                (size * 2, 0), (size * 2, size * 4), size // 2)
+                pygame.draw.line(sparkle_surf, (255, 255, 200, alpha), 
+                                (0, size * 2), (size * 4, size * 2), size // 2)
+                
+                # X shape (diagonal lines)
+                pygame.draw.line(sparkle_surf, (255, 255, 255, alpha), 
+                                (size, size), (size * 3, size * 3), size // 2)
+                pygame.draw.line(sparkle_surf, (255, 255, 255, alpha), 
+                                (size * 3, size), (size, size * 3), size // 2)
+                
+                # Small center glow
+                pygame.draw.circle(sparkle_surf, (255, 255, 255, alpha), 
+                                  (size * 2, size * 2), size)
+                
+                # Apply rotation for twinkling effect
+                rot_angle = (current_time / 20 + sparkle_positions.index(pos) * 30) % 360
+                rotated_sparkle = pygame.transform.rotate(sparkle_surf, rot_angle)
+                sparkle_rect = rotated_sparkle.get_rect(center=pos)
+                DISPLAYSURF.blit(rotated_sparkle, sparkle_rect)
         
         # Draw buttons
         button_font = pygame.font.Font(None, 32)
