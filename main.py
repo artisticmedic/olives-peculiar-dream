@@ -149,6 +149,18 @@ platforms = [
     {"x": 520, "y": WINDOW_HEIGHT - 400, "width": 120, "height": 20},
 ]
 
+# Kibble properties
+kibbles = [
+    {"x": 250, "y": WINDOW_HEIGHT - 150, "radius": 8, "collected": False, "color": (255, 200, 100)},
+    {"x": 350, "y": WINDOW_HEIGHT - 220, "radius": 8, "collected": False, "color": (255, 180, 80)},
+    {"x": 430, "y": WINDOW_HEIGHT - 290, "radius": 8, "collected": False, "color": (255, 160, 60)},
+    {"x": 510, "y": WINDOW_HEIGHT - 360, "radius": 8, "collected": False, "color": (255, 140, 40)},
+    {"x": 300, "y": WINDOW_HEIGHT - 80, "radius": 8, "collected": False, "color": (255, 120, 20)},
+]
+kibble_count = 0
+kibble_message = {"active": False, "text": "", "timer": 0, "duration": 1000}
+kibble_messages = ["Yum!", "Mmm!", "Tasty!", "Meow!", "Delicious!"]
+
 # Trophy properties (make it a cat toy)
 trophy = {"x": 560, "y": WINDOW_HEIGHT - 450, "width": 40, "height": 40, "collected": False}
 
@@ -254,6 +266,24 @@ while True:
     for drop in rain_drops:
         drop.update()
     
+    # Check kibble collection
+    for kibble in kibbles:
+        if (not kibble["collected"] and
+            player_x + player_width > kibble["x"] - kibble["radius"] and
+            player_x < kibble["x"] + kibble["radius"] and
+            player_y + player_height > kibble["y"] - kibble["radius"] and
+            player_y < kibble["y"] + kibble["radius"]):
+            kibble["collected"] = True
+            kibble_count += 1
+            # Show a random message
+            kibble_message["active"] = True
+            kibble_message["text"] = random.choice(kibble_messages)
+            kibble_message["timer"] = pygame.time.get_ticks()
+    
+    # Update kibble message timing
+    if kibble_message["active"] and pygame.time.get_ticks() - kibble_message["timer"] > kibble_message["duration"]:
+        kibble_message["active"] = False
+    
     # Check collision with platforms
     is_jumping = True
     for platform in platforms:
@@ -344,6 +374,21 @@ while True:
     text_rect = text_surface.get_rect(center=rain_toggle_rect.center)
     DISPLAYSURF.blit(text_surface, text_rect)
     
+    # Draw kibble counter
+    kibble_font = pygame.font.Font(None, 32)
+    # Draw container background
+    kibble_rect = pygame.Rect(WINDOW_WIDTH - 120, 20, 100, 40)
+    pygame.draw.rect(DISPLAYSURF, (40, 40, 60), kibble_rect, border_radius=10)
+    pygame.draw.rect(DISPLAYSURF, (100, 100, 120), kibble_rect, width=2, border_radius=10)
+    
+    # Add a kibble icon
+    pygame.draw.circle(DISPLAYSURF, (255, 160, 60), (WINDOW_WIDTH - 100, 40), 8)
+    pygame.draw.circle(DISPLAYSURF, (200, 120, 40), (WINDOW_WIDTH - 100, 40), 8, width=1)
+    
+    # Draw kibble count
+    count_text = kibble_font.render(f"x {kibble_count}", True, (220, 220, 220))
+    DISPLAYSURF.blit(count_text, (WINDOW_WIDTH - 80, 31))
+    
     # Draw platforms with a more skeuomorphic look
     for platform in platforms:
         # Draw platform with a 3D effect
@@ -358,8 +403,51 @@ while True:
                          (platform["x"], platform["y"] + platform["height"]), 
                          (platform["x"] + platform["width"], platform["y"] + platform["height"]), 2)
     
+    # Draw kibbles
+    for kibble in kibbles:
+        if not kibble["collected"]:
+            # Draw kibble as a small circle with slight glow effect
+            glow_radius = kibble["radius"] + 2 + math.sin(pygame.time.get_ticks() * 0.01) * 2
+            glow_color = (kibble["color"][0], kibble["color"][1]//2, kibble["color"][2]//4, 150)
+            glow_surf = pygame.Surface((glow_radius*2, glow_radius*2), pygame.SRCALPHA)
+            pygame.draw.circle(glow_surf, glow_color, (glow_radius, glow_radius), glow_radius)
+            DISPLAYSURF.blit(glow_surf, (kibble["x"]-glow_radius, kibble["y"]-glow_radius))
+            
+            # Main kibble
+            pygame.draw.circle(DISPLAYSURF, kibble["color"], (kibble["x"], kibble["y"]), kibble["radius"])
+            # Shine effect
+            pygame.draw.circle(DISPLAYSURF, (255, 255, 200), 
+                             (kibble["x"]-2, kibble["y"]-2), 2)
+    
     # Draw player as a cat sprite
     DISPLAYSURF.blit(cat_sprites[current_sprite], (player_x, player_y))
+    
+    # Draw player speech bubble when collecting kibble
+    if kibble_message["active"]:
+        # Position above player
+        bubble_x = player_x + player_width // 2 - 30
+        bubble_y = player_y - 40
+        
+        # Draw the speech bubble
+        pygame.draw.ellipse(DISPLAYSURF, WHITE, 
+                           (bubble_x, bubble_y, 60, 30))
+        pygame.draw.ellipse(DISPLAYSURF, BLACK, 
+                           (bubble_x, bubble_y, 60, 30), 2)
+        
+        # Draw pointer to player
+        pointer_points = [
+            (bubble_x + 20, bubble_y + 30),
+            (bubble_x + 10, bubble_y + 40),
+            (bubble_x + 30, bubble_y + 30)
+        ]
+        pygame.draw.polygon(DISPLAYSURF, WHITE, pointer_points)
+        pygame.draw.polygon(DISPLAYSURF, BLACK, pointer_points, 2)
+        
+        # Draw text
+        font = pygame.font.Font(None, 20)
+        text_surface = font.render(kibble_message["text"], True, BLACK)
+        text_rect = text_surface.get_rect(center=(bubble_x + 30, bubble_y + 15))
+        DISPLAYSURF.blit(text_surface, text_rect)
     
     # Draw trophy if not collected (as a cat toy)
     if not trophy["collected"]:
