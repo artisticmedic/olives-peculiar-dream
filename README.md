@@ -30,7 +30,7 @@ The code is organized into these main directories:
 
 ## How to Run the Game
 
-### Option 1: Run Locally (Step-by-Step Instructions)
+### Local
 
 1. Download the game files:
    - Go to [https://github.com/[your-username]/olive-peculiar-dream](https://github.com/[your-username]/olive-peculiar-dream)
@@ -60,12 +60,6 @@ The code is organized into these main directories:
      ```
      python run_game.py
      ```
-
-### Option 2: Run on Replit (Easiest Method)
-
-1. Visit the Replit project page: [https://replit.com/@[username]/olive-peculiar-dream](https://replit.com/@[username]/olive-peculiar-dream)
-2. Click the green "Run" button at the top of the page
-3. The game will start automatically in the output window
 
 ## Game Objective
 
