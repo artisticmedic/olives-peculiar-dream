@@ -621,7 +621,7 @@ while True:
 
         # Add an inner border glow
         pygame.draw.rect(DISPLAYSURF, (100, 100, 120), 
-                        (container_x + 8, container_y + 8, container_width - 16, container_height - 16), 
+                        (container_x + 8, container_y + 8, containerwidth - 16, container_height - 16), 
                         width=2, border_radius=25)
 
         # Draw Olive cat images as decorative elements around the container
@@ -639,7 +639,8 @@ while True:
             rotation = (angle + current_time // 20) % 360
             # Use fewer scale values (just 3 instead of continuous)
             scale_index = int((current_time * 0.001 + i * 0.5) % 3)
-            scales = [0.7, 0.85, 1.0]  # Pre-computed scales
+            # Reduced scales to 1/3 of original size
+            scales = [0.23, 0.28, 0.33]  # Pre-computed scales (1/3 of original)
             scale = scales[scale_index]
 
             # Use a cache for rotated images to avoid expensive transforms
@@ -667,24 +668,18 @@ while True:
             # Apply colored overlay with alpha blending
             DISPLAYSURF.blit(rotated_cat, rect, special_flags=pygame.BLEND_RGB_ADD)
 
-        # Display thank you message with a more elegant style
+        # Display thank you message with a clean style (no shadows)
         font = pygame.font.Font(None, 42)
-        shadow_offset = 4  # Increased shadow offset
 
         lines = [
             "Ariel,",
-            "Thank you for being an incredible",  # Capitalized T
+            "Thank you for being an incredible",
             "team member (and for bringing",
             "Olive to all of our meetings)."
         ]
 
         for i, line in enumerate(lines):
-            # Draw text shadow with pure black, no alpha
-            shadow_text = font.render(line, True, (0, 0, 0))
-            shadow_rect = shadow_text.get_rect(center=(WINDOW_WIDTH // 2 + shadow_offset, container_y + 120 + i * 45 + shadow_offset))
-            DISPLAYSURF.blit(shadow_text, shadow_rect)
-
-            # Draw text
+            # Draw text (no shadows)
             text = font.render(line, True, WHITE)
             text_rect = text.get_rect(center=(WINDOW_WIDTH // 2, container_y + 120 + i * 45))
             DISPLAYSURF.blit(text, text_rect)
@@ -810,28 +805,10 @@ while True:
             button_height
         )
 
-        # Draw Restart button (black with white text)
+        # Draw Restart button (black with white text) - clean version without shadows
+        # Use same rectangle for both fill and border
         pygame.draw.rect(DISPLAYSURF, BLACK, restart_button, border_radius=10)
-
-        # Button highlight for restart button
-        pygame.draw.line(DISPLAYSURF, (50, 50, 50), 
-                        (restart_button.x + 3, restart_button.y + 3),
-                        (restart_button.x + restart_button.width - 3, restart_button.y + 3), 
-                        2)
-        pygame.draw.line(DISPLAYSURF, (50, 50, 50), 
-                        (restart_button.x + 3, restart_button.y + 3),
-                        (restart_button.x + 3, restart_button.y + restart_button.height - 3), 
-                        2)
-
-        # Button shadow for restart button
-        pygame.draw.line(DISPLAYSURF, (20, 20, 20), 
-                        (restart_button.x + 3, restart_button.y + restart_button.height - 3),
-                        (restart_button.x + restart_button.width - 3, restart_button.y + restart_button.height - 3), 
-                        2)
-        pygame.draw.line(DISPLAYSURF, (20, 20, 20), 
-                        (restart_button.x + restart_button.width - 3, restart_button.y + 3),
-                        (restart_button.x + restart_button.width - 3, restart_button.y + restart_button.height - 3), 
-                        2)
+        pygame.draw.rect(DISPLAYSURF, WHITE, restart_button, width=2, border_radius=10)
 
         # Restart button text (white)
         restart_text = button_font.render("Restart", True, WHITE)
@@ -876,8 +853,7 @@ while True:
         # Add button border after content
         pygame.draw.rect(DISPLAYSURF, WHITE, confetti_button, width=2, border_radius=10)
 
-        # Create animated confetti button text
-        # Draw text directly on screen instead of on a separate surface for better positioning
+        # Create animated confetti button text (no shadow)
         confetti_text = button_font.render("Confetti!", True, WHITE)
 
         # Make text "bounce" slightly
@@ -887,12 +863,7 @@ while True:
         text_x = confetti_button.x + confetti_button.width // 2
         text_y = confetti_button.y + confetti_button.height // 2 + bounce_offset
 
-        # Apply drop shadow to text
-        shadow_text = button_font.render("Confetti!", True, (0, 0, 0))
-        shadow_rect = shadow_text.get_rect(center=(text_x + 2, text_y + 2))
-        DISPLAYSURF.blit(shadow_text, shadow_rect)
-
-        # Apply main text
+        # Apply main text (no shadow)
         confetti_text_rect = confetti_text.get_rect(center=(text_x, text_y))
         DISPLAYSURF.blit(confetti_text, confetti_text_rect)
 
