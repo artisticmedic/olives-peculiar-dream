@@ -107,6 +107,9 @@ player_jump = -15
 gravity = 0.8
 is_jumping = False
 
+# Camera properties
+camera_offset_x = 0
+
 # Cat player sprites
 cat_sprites = {
     "idle": pygame.Surface((player_width, player_height), pygame.SRCALPHA),
@@ -265,6 +268,9 @@ def add_confetti_burst(x, y, amount=100):
 # Delta time for frame-independent movement
 last_time = pygame.time.get_ticks()
 
+#World width calculation.  This needs to be calculated dynamically based on the level generation
+world_width = WINDOW_WIDTH
+
 # Main game loop
 while True:
     # Calculate delta time for smoother movement regardless of framerate
@@ -314,6 +320,14 @@ while True:
 
     # Apply gravity with delta time
     player_vel_y += gravity * dt * 60
+
+    # Update camera position (centered on player horizontally)
+    if player_x > WINDOW_WIDTH / 2 and player_x < world_width - WINDOW_WIDTH / 2:
+        camera_offset_x = player_x - WINDOW_WIDTH / 2
+    elif player_x >= world_width - WINDOW_WIDTH / 2:
+        camera_offset_x = world_width - WINDOW_WIDTH
+    else:
+        camera_offset_x = 0
 
     # Update parallax effect based on player movement
     if player_vel_x != 0:
@@ -367,8 +381,8 @@ while True:
     # Check boundaries
     if player_x < 0:
         player_x = 0
-    if player_x + player_width > WINDOW_WIDTH:
-        player_x = WINDOW_WIDTH - player_width
+    if player_x + player_width > world_width:
+        player_x = world_width - player_width
     if player_y + player_height > WINDOW_HEIGHT:
         player_y = WINDOW_HEIGHT - player_height
         player_vel_y = 0
@@ -399,8 +413,8 @@ while True:
     # Draw parallax cat background
     if cat_image:
         # Draw the cat image in two positions for seamless scrolling
-        DISPLAYSURF.blit(cat_image, (-parallax_offset, 0))
-        DISPLAYSURF.blit(cat_image, (WINDOW_WIDTH - parallax_offset, 0))
+        DISPLAYSURF.blit(cat_image, (-parallax_offset - camera_offset_x, 0))
+        DISPLAYSURF.blit(cat_image, (WINDOW_WIDTH - parallax_offset - camera_offset_x, 0))
 
         # Apply a semi-transparent overlay for better visibility
         overlay = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
@@ -458,15 +472,15 @@ while True:
     for platform in platforms:
         # Draw platform with a 3D effect
         pygame.draw.rect(DISPLAYSURF, GREEN, 
-                         (platform["x"], platform["y"], platform["width"], platform["height"]))
+                         (platform["x"] - camera_offset_x, platform["y"], platform["width"], platform["height"]))
         # Add highlight at the top
         pygame.draw.line(DISPLAYSURF, (180, 230, 180), 
-                         (platform["x"], platform["y"]), 
-                         (platform["x"] + platform["width"], platform["y"]), 2)
+                         (platform["x"] - camera_offset_x, platform["y"]), 
+                         (platform["x"] + platform["width"] - camera_offset_x, platform["y"]), 2)
         # Add shadow at the bottom
         pygame.draw.line(DISPLAYSURF, (90, 150, 90), 
-                         (platform["x"], platform["y"] + platform["height"]), 
-                         (platform["x"] + platform["width"], platform["y"] + platform["height"]), 2)
+                         (platform["x"] - camera_offset_x, platform["y"] + platform["height"]), 
+                         (platform["x"] + platform["width"] - camera_offset_x, platform["y"] + platform["height"]), 2)
 
     # Draw kibbles - with pre-calculated time values for better performance
     current_time = pygame.time.get_ticks()
@@ -474,29 +488,32 @@ while True:
 
     for kibble in kibbles:
         if not kibble["collected"]:
+            # Adjust for camera position
+            screen_x = kibble["x"] - camera_offset_x
+
             # Draw kibble as a small circle with slight glow effect
             glow_radius = kibble["radius"] + 2 + sin_value
 
             # Only create and draw glow if on screen (optimization)
-            if (0 <= kibble["x"] <= WINDOW_WIDTH and 0 <= kibble["y"] <= WINDOW_HEIGHT):
+            if (0 <= screen_x <= WINDOW_WIDTH and 0 <= kibble["y"] <= WINDOW_HEIGHT):
                 glow_color = (kibble["color"][0], kibble["color"][1]//2, kibble["color"][2]//4, 150)
                 glow_surf = pygame.Surface((glow_radius*2, glow_radius*2), pygame.SRCALPHA)
                 pygame.draw.circle(glow_surf, glow_color, (glow_radius, glow_radius), glow_radius)
-                DISPLAYSURF.blit(glow_surf, (kibble["x"]-glow_radius, kibble["y"]-glow_radius))
+                DISPLAYSURF.blit(glow_surf, (screen_x-glow_radius, kibble["y"]-glow_radius))
 
                 # Main kibble
-                pygame.draw.circle(DISPLAYSURF, kibble["color"], (kibble["x"], kibble["y"]), kibble["radius"])
+                pygame.draw.circle(DISPLAYSURF, kibble["color"], (screen_x, kibble["y"]), kibble["radius"])
                 # Shine effect
                 pygame.draw.circle(DISPLAYSURF, (255, 255, 200), 
-                                (kibble["x"]-2, kibble["y"]-2), 2)
+                                (screen_x-2, kibble["y"]-2), 2)
 
     # Draw player as a cat sprite
-    DISPLAYSURF.blit(cat_sprites[current_sprite], (player_x, player_y))
+    DISPLAYSURF.blit(cat_sprites[current_sprite], (player_x - camera_offset_x, player_y))
 
     # Draw player speech bubble when collecting kibble
     if kibble_message["active"]:
         # Position above player
-        bubble_x = player_x + player_width // 2 - 30
+        bubble_x = player_x + player_width // 2 - 30 - camera_offset_x
         bubble_y = player_y - 40
 
         # Draw the speech bubble
@@ -521,29 +538,30 @@ while True:
         DISPLAYSURF.blit(text_surface, text_rect)
 
     # Draw trophy if not collected (as a cat toy)
+    trophy_screen_x = trophy["x"] - camera_offset_x
     if not trophy["collected"]:
         # Draw a cat toy (mouse)
         pygame.draw.ellipse(DISPLAYSURF, (150, 150, 150), 
-                           (trophy["x"], trophy["y"], trophy["width"], trophy["height"] * 0.7))
+                           (trophy_screen_x, trophy["y"], trophy["width"], trophy["height"] * 0.7))
         # Ears
         pygame.draw.circle(DISPLAYSURF, (150, 150, 150), 
-                          (trophy["x"] + 10, trophy["y"]), 8)
+                          (trophy_screen_x + 10, trophy["y"]), 8)
         pygame.draw.circle(DISPLAYSURF, (150, 150, 150), 
-                          (trophy["x"] + trophy["width"] - 10, trophy["y"]), 8)
+                          (trophy_screen_x + trophy["width"] - 10, trophy["y"]), 8)
         # Tail
         pygame.draw.line(DISPLAYSURF, (150, 150, 150), 
-                        (trophy["x"] + trophy["width"] // 2, trophy["y"] + trophy["height"] * 0.7),
-                        (trophy["x"] + trophy["width"] // 2 + 15, trophy["y"] + trophy["height"]), 3)
+                        (trophy_screen_x + trophy["width"] // 2, trophy["y"] + trophy["height"] * 0.7),
+                        (trophy_screen_x + trophy["width"] // 2 + 15, trophy["y"] + trophy["height"]), 3)
 
         # Draw speech bubble for the mouse
-        if speech_bubble["active"]:
+        if speech_bubble["active"] and (0 <= trophy_screen_x <= WINDOW_WIDTH):
             # Update speech bubble movement
             current_time = pygame.time.get_ticks()
             speech_bubble["offset_x"] = math.sin(current_time * 0.005) * 3
             speech_bubble["offset_y"] = math.cos(current_time * 0.003) * 2
 
-            # Position of speech bubble
-            bubble_x = trophy["x"] + trophy["width"] + 5 + speech_bubble["offset_x"]
+            # Position of speech bubble (adjust for camera)
+            bubble_x = trophy_screen_x + trophy["width"] + 5 + speech_bubble["offset_x"]
             bubble_y = trophy["y"] - 50 + speech_bubble["offset_y"]
 
             # Progress the text animation
@@ -850,7 +868,7 @@ while True:
         # First create the base with correct dimensions
         confetti_button_base = pygame.transform.scale(confetti_button_base, 
                                                    (confetti_button.width-4, confetti_button.height-4))
-        
+
         # Apply button base to screen (positioned within the border)
         DISPLAYSURF.blit(confetti_button_base, (confetti_button.x+2, confetti_button.y+2))
 
