@@ -577,8 +577,13 @@ while True:
         
         # Draw Olive cat images as decorative elements around the container
         current_time = pygame.time.get_ticks()
-        # Load the olive cat image once
-        olive_cat_img = load_olive_cat_image()
+        
+        # Load the olive cat image - fixing the path to use the correct image
+        if not hasattr(load_olive_cat_image, 'image'):
+            olive_cat_img = load_olive_cat_image()
+            load_olive_cat_image.image = olive_cat_img
+        else:
+            olive_cat_img = load_olive_cat_image.image
         
         for i in range(12):
             angle = (i * 30 + current_time // 50) % 360
