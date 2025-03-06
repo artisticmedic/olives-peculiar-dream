@@ -3,21 +3,23 @@ import pygame
 import os
 
 def load_olive_cat_image():
-    cat_path = os.path.join("Game", "olive_cat.png")
-    if os.path.exists(cat_path):
+    olive_path = os.path.join("Game", "Assets", "olive_cat.png")
+    if os.path.exists(olive_path):
         try:
-            # Load and scale the image
-            original_img = pygame.image.load(cat_path)
-            # Return a scaled version for the rotating sprites
-            return pygame.transform.scale(original_img, (40, 40))
+            return pygame.image.load(olive_path)
         except pygame.error:
-            print(f"Error loading Olive cat image from {cat_path}")
-    else:
-        print(f"Olive cat image not found at {cat_path}")
+            print(f"Error loading olive cat from {olive_path}")
     
-    # Create a fallback image
+    # Fallback: create a simple cat
     fallback = pygame.Surface((40, 40), pygame.SRCALPHA)
-    fallback.fill((200, 200, 200, 200))
-    pygame.draw.circle(fallback, (150, 150, 150), (20, 20), 15)
+    fallback.fill((0, 0, 0, 0))  # Transparent
+    
+    # Draw a simple cat shape
+    pygame.draw.ellipse(fallback, (200, 180, 120), (5, 5, 30, 25))  # Head
+    pygame.draw.polygon(fallback, (200, 180, 120), [(15, 5), (20, 0), (25, 5)])  # Left ear
+    pygame.draw.polygon(fallback, (200, 180, 120), [(25, 5), (30, 0), (35, 5)])  # Right ear
+    pygame.draw.circle(fallback, (50, 100, 50), (15, 15), 3)  # Left eye
+    pygame.draw.circle(fallback, (50, 100, 50), (25, 15), 3)  # Right eye
+    pygame.draw.ellipse(fallback, (255, 150, 150), (18, 20, 4, 3))  # Nose
     
     return fallback
