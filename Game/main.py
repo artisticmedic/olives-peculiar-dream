@@ -219,8 +219,8 @@ kibble_count = 0
 kibble_message = {"active": False, "text": "", "timer": 0, "duration": 1000}
 kibble_messages = ["Yum!", "Mmm!", "Tasty!", "Meow!", "Delicious!"]
 
-# Trophy properties (make it a cat toy) - moved to the end of the map
-trophy = {"x": 2700, "y": WINDOW_HEIGHT - 170, "width": 40, "height": 40, "collected": False}
+# Trophy properties (make it a cat toy) - moved to approximately 2/3 of the map
+trophy = {"x": 2150, "y": WINDOW_HEIGHT - 230, "width": 40, "height": 40, "collected": False}
 
 # Celebration properties
 celebration_active = False
