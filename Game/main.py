@@ -621,7 +621,7 @@ while True:
 
         # Add an inner border glow
         pygame.draw.rect(DISPLAYSURF, (100, 100, 120), 
-                        (container_x + 8, container_y + 8, containerwidth - 16, container_height - 16), 
+                        (container_x + 8, container_y + 8, container_width - 16, container_height - 16), 
                         width=2, border_radius=25)
 
         # Draw Olive cat images as decorative elements around the container
@@ -806,8 +806,14 @@ while True:
         )
 
         # Draw Restart button (black with white text) - clean version without shadows
-        # Use same rectangle for both fill and border
-        pygame.draw.rect(DISPLAYSURF, BLACK, restart_button, border_radius=10)
+        # Draw the black fill slightly smaller than the border
+        inner_restart = pygame.Rect(
+            restart_button.x + 2,
+            restart_button.y + 2,
+            restart_button.width - 4,
+            restart_button.height - 4
+        )
+        pygame.draw.rect(DISPLAYSURF, BLACK, inner_restart, border_radius=8)
         pygame.draw.rect(DISPLAYSURF, WHITE, restart_button, width=2, border_radius=10)
 
         # Restart button text (white)
@@ -840,15 +846,13 @@ while True:
             pygame.draw.rect(confetti_button_base, (r, g, b), 
                             (x, y, size, size))
 
-        # Create a smaller surface for the content (2px smaller on each side)
-        inner_button = pygame.Rect(
-            confetti_button.x + 2, 
-            confetti_button.y + 2, 
-            confetti_button.width - 4, 
-            confetti_button.height - 4
-        )
-        # Apply button base to screen (within borders)
-        DISPLAYSURF.blit(confetti_button_base, inner_button)
+        # Create button content that fits within the border
+        # First create the base with correct dimensions
+        confetti_button_base = pygame.transform.scale(confetti_button_base, 
+                                                   (confetti_button.width-4, confetti_button.height-4))
+        
+        # Apply button base to screen (positioned within the border)
+        DISPLAYSURF.blit(confetti_button_base, (confetti_button.x+2, confetti_button.y+2))
 
         # Add button border after content
         pygame.draw.rect(DISPLAYSURF, WHITE, confetti_button, width=2, border_radius=10)
