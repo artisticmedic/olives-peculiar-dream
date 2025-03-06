@@ -35,6 +35,10 @@ clock = pygame.time.Clock()
 cat_image = load_cat_image()
 parallax_offset = 0
 
+# Digital rain toggle
+rain_enabled = False  # Default off
+rain_toggle_rect = pygame.Rect(20, 20, 40, 40)
+
 # Digital rain properties
 class RainDrop:
     def __init__(self):
@@ -79,6 +83,17 @@ class RainDrop:
 
 # Create rain drops
 rain_drops = [RainDrop() for _ in range(100)]
+
+# Speech bubble properties
+speech_bubble = {
+    "active": True,
+    "text": "Pst! Up here!",
+    "timer": 0,
+    "duration": 2000,  # How long to display each part of text
+    "char_index": 0,
+    "offset_x": 0,
+    "offset_y": 0
+}
 
 # Player properties
 player_width = 40
@@ -193,6 +208,14 @@ while True:
             pygame.quit()
             sys.exit()
         
+        # Mouse click events
+        if event.type == MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
+            mouse_pos = pygame.mouse.get_pos()
+            
+            # Check if rain toggle button was clicked
+            if rain_toggle_rect.collidepoint(mouse_pos):
+                rain_enabled = not rain_enabled
+        
         # Key press events
         if event.type == KEYDOWN:
             if event.key == K_LEFT:
@@ -290,9 +313,38 @@ while True:
         overlay.set_alpha(100)
         DISPLAYSURF.blit(overlay, (0, 0))
     
-    # Draw digital rain effect
-    for drop in rain_drops:
-        drop.draw(DISPLAYSURF)
+    # Draw digital rain effect if enabled
+    if rain_enabled:
+        for drop in rain_drops:
+            drop.draw(DISPLAYSURF)
+    
+    # Draw rain toggle button
+    pygame.draw.rect(DISPLAYSURF, (40, 40, 60), rain_toggle_rect, border_radius=10)
+    pygame.draw.rect(DISPLAYSURF, (100, 100, 120), rain_toggle_rect, width=2, border_radius=10)
+    
+    # Draw toggle status indicator
+    toggle_status_rect = pygame.Rect(
+        rain_toggle_rect.x + 5,
+        rain_toggle_rect.y + 5,
+        rain_toggle_rect.width - 10,
+        rain_toggle_rect.height - 10
+    )
+    
+    if rain_enabled:
+        # Draw toggle as ON (filled)
+        pygame.draw.rect(DISPLAYSURF, (100, 200, 255), toggle_status_rect, border_radius=8)
+        rain_icon_color = (20, 20, 40)
+    else:
+        # Draw toggle as OFF (empty)
+        pygame.draw.rect(DISPLAYSURF, (40, 40, 60), toggle_status_rect, border_radius=8)
+        rain_icon_color = (180, 180, 220)
+    
+    # Draw rain icon (simplified for toggle button)
+    for i in range(3):
+        start_x = rain_toggle_rect.x + 10 + i * 10
+        start_y = rain_toggle_rect.y + 10
+        end_y = rain_toggle_rect.y + rain_toggle_rect.height - 10
+        pygame.draw.line(DISPLAYSURF, rain_icon_color, (start_x, start_y), (start_x, end_y), 2)
     
     # Draw platforms with a more skeuomorphic look
     for platform in platforms:
@@ -325,6 +377,56 @@ while True:
         pygame.draw.line(DISPLAYSURF, (150, 150, 150), 
                         (trophy["x"] + trophy["width"] // 2, trophy["y"] + trophy["height"] * 0.7),
                         (trophy["x"] + trophy["width"] // 2 + 15, trophy["y"] + trophy["height"]), 3)
+                        
+        # Draw speech bubble for the mouse
+        if speech_bubble["active"]:
+            # Update speech bubble movement
+            current_time = pygame.time.get_ticks()
+            speech_bubble["offset_x"] = math.sin(current_time * 0.005) * 3
+            speech_bubble["offset_y"] = math.cos(current_time * 0.003) * 2
+            
+            # Position of speech bubble
+            bubble_x = trophy["x"] + trophy["width"] + 5 + speech_bubble["offset_x"]
+            bubble_y = trophy["y"] - 50 + speech_bubble["offset_y"]
+            
+            # Progress the text animation
+            if current_time - speech_bubble["timer"] > 100:  # Control character reveal speed
+                speech_bubble["timer"] = current_time
+                if speech_bubble["char_index"] < len(speech_bubble["text"]):
+                    speech_bubble["char_index"] += 1
+            
+            # Current text to display
+            current_text = speech_bubble["text"][:speech_bubble["char_index"]]
+            
+            if current_text:
+                # Draw the speech bubble
+                font = pygame.font.Font(None, 24)
+                text_surface = font.render(current_text, True, BLACK)
+                text_rect = text_surface.get_rect()
+                
+                # Make bubble size fit text
+                padding = 10
+                bubble_width = text_rect.width + padding * 2
+                bubble_height = text_rect.height + padding * 2
+                
+                # Draw bubble background
+                pygame.draw.ellipse(DISPLAYSURF, WHITE, 
+                                   (bubble_x, bubble_y, bubble_width, bubble_height))
+                pygame.draw.ellipse(DISPLAYSURF, BLACK, 
+                                   (bubble_x, bubble_y, bubble_width, bubble_height), 2)
+                
+                # Draw pointer to mouse
+                pointer_points = [
+                    (bubble_x + 10, bubble_y + bubble_height - 5),
+                    (bubble_x - 5, bubble_y + bubble_height + 10),
+                    (bubble_x + 20, bubble_y + bubble_height)
+                ]
+                pygame.draw.polygon(DISPLAYSURF, WHITE, pointer_points)
+                pygame.draw.polygon(DISPLAYSURF, BLACK, pointer_points, 2)
+                
+                # Draw text
+                DISPLAYSURF.blit(text_surface, 
+                              (bubble_x + padding, bubble_y + padding))
     
     # Handle celebration
     if celebration_active:
@@ -503,26 +605,24 @@ while True:
         pygame.draw.rect(DISPLAYSURF, WHITE, confetti_button, width=2, border_radius=10)
         
         # Create animated confetti button text
-        confetti_text_base = pygame.Surface((button_width - 20, button_height - 20), pygame.SRCALPHA)
+        # Draw text directly on screen instead of on a separate surface for better positioning
         confetti_text = button_font.render("Confetti!", True, WHITE)
         
         # Make text "bounce" slightly
         bounce_offset = int(math.sin(current_time * 0.01) * 3)
-        confetti_text_rect = confetti_text.get_rect(
-            center=(confetti_button.width // 2, confetti_button.height // 2 + bounce_offset)
-        )
+        
+        # Calculate exact center position of the button
+        text_x = confetti_button.x + confetti_button.width // 2
+        text_y = confetti_button.y + confetti_button.height // 2 + bounce_offset
         
         # Apply drop shadow to text
         shadow_text = button_font.render("Confetti!", True, (0, 0, 0))
-        shadow_rect = shadow_text.get_rect(center=(confetti_text_rect.centerx + 2, confetti_text_rect.centery + 2))
-        confetti_text_base.blit(shadow_text, shadow_rect)
+        shadow_rect = shadow_text.get_rect(center=(text_x + 2, text_y + 2))
+        DISPLAYSURF.blit(shadow_text, shadow_rect)
         
         # Apply main text
-        confetti_text_base.blit(confetti_text, confetti_text_rect)
-        
-        # Apply text to button
-        DISPLAYSURF.blit(confetti_text_base, 
-                        (confetti_button.x + 10, confetti_button.y + 10))
+        confetti_text_rect = confetti_text.get_rect(center=(text_x, text_y))
+        DISPLAYSURF.blit(confetti_text, confetti_text_rect)
         
         # Check for button clicks
         mouse_pos = pygame.mouse.get_pos()
