@@ -143,242 +143,84 @@ current_sprite = "idle"
 # Platform properties
 platforms = [
     # Base platforms - make it longer to start with
-    {"x": 0, "y": WINDOW_HEIGHT - 50, "width": WINDOW_WIDTH * 3, "height": 50},
-    # Pyramid platforms
+    {"x": 0, "y": WINDOW_HEIGHT - 50, "width": WINDOW_WIDTH * 4, "height": 50},
+    
+    # First section - Pyramid platforms (original)
     {"x": 200, "y": WINDOW_HEIGHT - 120, "width": 150, "height": 20},
     {"x": 280, "y": WINDOW_HEIGHT - 190, "width": 150, "height": 20},
     {"x": 360, "y": WINDOW_HEIGHT - 260, "width": 150, "height": 20},
     {"x": 440, "y": WINDOW_HEIGHT - 330, "width": 150, "height": 20},
     {"x": 520, "y": WINDOW_HEIGHT - 400, "width": 120, "height": 20},
+    
+    # Second section - Staircase platforms
+    {"x": 700, "y": WINDOW_HEIGHT - 120, "width": 120, "height": 20},
+    {"x": 850, "y": WINDOW_HEIGHT - 180, "width": 120, "height": 20},
+    {"x": 1000, "y": WINDOW_HEIGHT - 240, "width": 120, "height": 20},
+    {"x": 1150, "y": WINDOW_HEIGHT - 300, "width": 120, "height": 20},
+    
+    # Third section - Floating platforms
+    {"x": 1300, "y": WINDOW_HEIGHT - 200, "width": 100, "height": 20},
+    {"x": 1430, "y": WINDOW_HEIGHT - 150, "width": 100, "height": 20},
+    {"x": 1560, "y": WINDOW_HEIGHT - 250, "width": 100, "height": 20},
+    {"x": 1690, "y": WINDOW_HEIGHT - 180, "width": 100, "height": 20},
+    {"x": 1820, "y": WINDOW_HEIGHT - 300, "width": 100, "height": 20},
+    
+    # Fourth section - Zigzag platforms
+    {"x": 2000, "y": WINDOW_HEIGHT - 120, "width": 130, "height": 20},
+    {"x": 2150, "y": WINDOW_HEIGHT - 200, "width": 130, "height": 20},
+    {"x": 2300, "y": WINDOW_HEIGHT - 120, "width": 130, "height": 20},
+    {"x": 2450, "y": WINDOW_HEIGHT - 200, "width": 130, "height": 20},
+    {"x": 2600, "y": WINDOW_HEIGHT - 120, "width": 130, "height": 20},
 ]
+
+# Define kibble colors
+kibble_colors = [(255, 200, 100), (255, 180, 80), (255, 160, 60), (255, 140, 40), (255, 120, 20)]
 
 # Kibble properties
 kibbles = [
-    {"x": 250, "y": WINDOW_HEIGHT - 150, "radius": 8, "collected": False, "color": (255, 200, 100)},
-    {"x": 350, "y": WINDOW_HEIGHT - 220, "radius": 8, "collected": False, "color": (255, 180, 80)},
-    {"x": 430, "y": WINDOW_HEIGHT - 290, "radius": 8, "collected": False, "color": (255, 160, 60)},
-    {"x": 510, "y": WINDOW_HEIGHT - 360, "radius": 8, "collected": False, "color": (255, 140, 40)},
-    {"x": 300, "y": WINDOW_HEIGHT - 80, "radius": 8, "collected": False, "color": (255, 120, 20)},
+    # Original kibbles
+    {"x": 250, "y": WINDOW_HEIGHT - 150, "radius": 8, "collected": False, "color": kibble_colors[0]},
+    {"x": 350, "y": WINDOW_HEIGHT - 220, "radius": 8, "collected": False, "color": kibble_colors[1]},
+    {"x": 430, "y": WINDOW_HEIGHT - 290, "radius": 8, "collected": False, "color": kibble_colors[2]},
+    {"x": 510, "y": WINDOW_HEIGHT - 360, "radius": 8, "collected": False, "color": kibble_colors[3]},
+    {"x": 300, "y": WINDOW_HEIGHT - 80, "radius": 8, "collected": False, "color": kibble_colors[4]},
+    
+    # Second section - Staircase kibbles
+    {"x": 760, "y": WINDOW_HEIGHT - 150, "radius": 8, "collected": False, "color": kibble_colors[0]},
+    {"x": 910, "y": WINDOW_HEIGHT - 210, "radius": 8, "collected": False, "color": kibble_colors[1]},
+    {"x": 1060, "y": WINDOW_HEIGHT - 270, "radius": 8, "collected": False, "color": kibble_colors[2]},
+    {"x": 1210, "y": WINDOW_HEIGHT - 330, "radius": 8, "collected": False, "color": kibble_colors[3]},
+    
+    # Third section - Floating platform kibbles
+    {"x": 1350, "y": WINDOW_HEIGHT - 230, "radius": 8, "collected": False, "color": kibble_colors[4]},
+    {"x": 1480, "y": WINDOW_HEIGHT - 180, "radius": 8, "collected": False, "color": kibble_colors[0]},
+    {"x": 1610, "y": WINDOW_HEIGHT - 280, "radius": 8, "collected": False, "color": kibble_colors[1]},
+    {"x": 1740, "y": WINDOW_HEIGHT - 210, "radius": 8, "collected": False, "color": kibble_colors[2]},
+    {"x": 1870, "y": WINDOW_HEIGHT - 330, "radius": 8, "collected": False, "color": kibble_colors[3]},
+    
+    # Fourth section - Zigzag kibbles
+    {"x": 2065, "y": WINDOW_HEIGHT - 150, "radius": 8, "collected": False, "color": kibble_colors[4]},
+    {"x": 2215, "y": WINDOW_HEIGHT - 230, "radius": 8, "collected": False, "color": kibble_colors[0]},
+    {"x": 2365, "y": WINDOW_HEIGHT - 150, "radius": 8, "collected": False, "color": kibble_colors[1]},
+    {"x": 2515, "y": WINDOW_HEIGHT - 230, "radius": 8, "collected": False, "color": kibble_colors[2]},
+    {"x": 2665, "y": WINDOW_HEIGHT - 150, "radius": 8, "collected": False, "color": kibble_colors[3]},
+    
+    # Extra kibbles on ground
+    {"x": 600, "y": WINDOW_HEIGHT - 80, "radius": 8, "collected": False, "color": kibble_colors[4]},
+    {"x": 1100, "y": WINDOW_HEIGHT - 80, "radius": 8, "collected": False, "color": kibble_colors[0]},
+    {"x": 1500, "y": WINDOW_HEIGHT - 80, "radius": 8, "collected": False, "color": kibble_colors[1]},
+    {"x": 1900, "y": WINDOW_HEIGHT - 80, "radius": 8, "collected": False, "color": kibble_colors[2]},
+    {"x": 2300, "y": WINDOW_HEIGHT - 80, "radius": 8, "collected": False, "color": kibble_colors[3]},
 ]
 
-# Map generation properties
-last_platform_x = max(p["x"] + p["width"] for p in platforms)
-generation_threshold = WINDOW_WIDTH * 1.5  # Generate more map when approaching this distance from the end
-kibble_colors = [(255, 200, 100), (255, 180, 80), (255, 160, 60), (255, 140, 40), (255, 120, 20)]
-
-# Function to generate new platforms and kibbles
-def generate_new_platforms(current_edge_x):
-    """Generate new platforms and kibbles extending to the right"""
-    global last_platform_x
-    
-    # How far to extend the map
-    extension_length = WINDOW_WIDTH * 2
-    new_edge_x = current_edge_x + extension_length
-    
-    # Generate diverse platform patterns
-    patterns = [
-        "staircase",
-        "floating",
-        "pyramid",
-        "zigzag",
-        "random"
-    ]
-    
-    pattern = random.choice(patterns)
-    start_x = last_platform_x + random.randint(80, 150)
-    
-    new_platforms = []
-    new_kibbles = []
-    
-    if pattern == "staircase":
-        # Staircase pattern
-        num_steps = random.randint(4, 8)
-        step_width = random.randint(100, 180)
-        step_height = random.randint(15, 25)
-        step_y_gap = random.randint(50, 70)
-        
-        for i in range(num_steps):
-            platform_x = start_x + i * step_width
-            platform_y = WINDOW_HEIGHT - 100 - i * step_y_gap
-            platform_width = step_width - 10
-            
-            new_platforms.append({
-                "x": platform_x,
-                "y": platform_y,
-                "width": platform_width,
-                "height": step_height
-            })
-            
-            # Add kibbles on some steps
-            if random.random() > 0.3:  # 70% chance of kibble
-                kibble_x = platform_x + platform_width // 2
-                kibble_y = platform_y - 20
-                new_kibbles.append({
-                    "x": kibble_x,
-                    "y": kibble_y,
-                    "radius": 8,
-                    "collected": False,
-                    "color": random.choice(kibble_colors)
-                })
-    
-    elif pattern == "floating":
-        # Floating platforms
-        num_platforms = random.randint(6, 10)
-        min_y = WINDOW_HEIGHT - 350
-        max_y = WINDOW_HEIGHT - 100
-        
-        for i in range(num_platforms):
-            platform_x = start_x + i * random.randint(100, 200)
-            platform_y = random.randint(min_y, max_y)
-            platform_width = random.randint(80, 150)
-            
-            new_platforms.append({
-                "x": platform_x,
-                "y": platform_y,
-                "width": platform_width,
-                "height": 20
-            })
-            
-            # Add kibbles on most platforms
-            if random.random() > 0.2:  # 80% chance of kibble
-                kibble_x = platform_x + platform_width // 2
-                kibble_y = platform_y - 20
-                new_kibbles.append({
-                    "x": kibble_x,
-                    "y": kibble_y,
-                    "radius": 8,
-                    "collected": False,
-                    "color": random.choice(kibble_colors)
-                })
-    
-    elif pattern == "pyramid":
-        # Pyramid pattern
-        base_width = random.randint(150, 250)
-        platform_count = random.randint(3, 6)
-        base_x = start_x
-        base_y = WINDOW_HEIGHT - 100
-        
-        for i in range(platform_count):
-            platform_width = base_width - (i * 30)
-            platform_x = base_x + (i * 40)
-            platform_y = base_y - (i * 60)
-            
-            new_platforms.append({
-                "x": platform_x,
-                "y": platform_y,
-                "width": platform_width,
-                "height": 20
-            })
-            
-            # Add kibbles on alternating platforms
-            if i % 2 == 0:
-                kibble_x = platform_x + platform_width // 2
-                kibble_y = platform_y - 20
-                new_kibbles.append({
-                    "x": kibble_x,
-                    "y": kibble_y,
-                    "radius": 8,
-                    "collected": False,
-                    "color": random.choice(kibble_colors)
-                })
-    
-    elif pattern == "zigzag":
-        # Zigzag pattern
-        num_platforms = random.randint(4, 8)
-        platform_width = random.randint(120, 180)
-        platform_gap = random.randint(30, 60)
-        start_y = WINDOW_HEIGHT - 120
-        
-        for i in range(num_platforms):
-            platform_x = start_x + i * (platform_width + platform_gap)
-            # Alternate up and down
-            if i % 2 == 0:
-                platform_y = start_y
-            else:
-                platform_y = start_y - 70
-                
-            new_platforms.append({
-                "x": platform_x,
-                "y": platform_y,
-                "width": platform_width,
-                "height": 20
-            })
-            
-            # Add kibbles above each platform
-            kibble_x = platform_x + platform_width // 2
-            kibble_y = platform_y - 25
-            new_kibbles.append({
-                "x": kibble_x,
-                "y": kibble_y,
-                "radius": 8,
-                "collected": False,
-                "color": random.choice(kibble_colors)
-            })
-    
-    else:  # random
-        # Random scattered platforms
-        num_platforms = random.randint(5, 9)
-        
-        for i in range(num_platforms):
-            platform_x = start_x + i * random.randint(120, 220)
-            platform_y = WINDOW_HEIGHT - random.randint(80, 350)
-            platform_width = random.randint(100, 180)
-            
-            new_platforms.append({
-                "x": platform_x,
-                "y": platform_y,
-                "width": platform_width,
-                "height": 20
-            })
-            
-            # Add 1-2 kibbles on longer platforms
-            if platform_width > 150:
-                for j in range(random.randint(1, 2)):
-                    kibble_x = platform_x + (j+1) * platform_width // 3
-                    kibble_y = platform_y - 20
-                    new_kibbles.append({
-                        "x": kibble_x,
-                        "y": kibble_y,
-                        "radius": 8,
-                        "collected": False,
-                        "color": random.choice(kibble_colors)
-                    })
-            else:
-                # Add single kibble on smaller platforms
-                if random.random() > 0.3:  # 70% chance
-                    kibble_x = platform_x + platform_width // 2
-                    kibble_y = platform_y - 20
-                    new_kibbles.append({
-                        "x": kibble_x,
-                        "y": kibble_y,
-                        "radius": 8,
-                        "collected": False,
-                        "color": random.choice(kibble_colors)
-                    })
-    
-    # Update the last platform position
-    if new_platforms:
-        last_platform_x = max(p["x"] + p["width"] for p in new_platforms)
-    
-    # Extend the base ground platform
-    base_extension = {
-        "x": platforms[0]["x"] + platforms[0]["width"],
-        "y": WINDOW_HEIGHT - 50,
-        "width": extension_length,
-        "height": 50
-    }
-    new_platforms.append(base_extension)
-    
-    # Update world width
-    world_width = max(world_width, new_edge_x)
-    
-    return new_platforms, new_kibbles
+# Set world width based on platforms
+world_width = WINDOW_WIDTH * 4
 kibble_count = 0
 kibble_message = {"active": False, "text": "", "timer": 0, "duration": 1000}
 kibble_messages = ["Yum!", "Mmm!", "Tasty!", "Meow!", "Delicious!"]
 
-# Trophy properties (make it a cat toy)
-trophy = {"x": 560, "y": WINDOW_HEIGHT - 450, "width": 40, "height": 40, "collected": False}
+# Trophy properties (make it a cat toy) - moved to the end of the map
+trophy = {"x": 2700, "y": WINDOW_HEIGHT - 170, "width": 40, "height": 40, "collected": False}
 
 # Celebration properties
 celebration_active = False
@@ -481,8 +323,8 @@ def add_confetti_burst(x, y, amount=100):
 # Delta time for frame-independent movement
 last_time = pygame.time.get_ticks()
 
-# Initial world width
-world_width = WINDOW_WIDTH * 3
+# Initial world width - fixed size that covers all platforms
+world_width = WINDOW_WIDTH * 4
 
 # Main game loop
 while True:
@@ -591,14 +433,7 @@ while True:
             if current_sprite == "jump":
                 current_sprite = "idle"
 
-    # Check if player is approaching the edge of the generated map
-    if player_x > last_platform_x - generation_threshold:
-        # Generate more platforms and kibbles
-        new_platforms, new_kibbles = generate_new_platforms(last_platform_x)
-        platforms.extend(new_platforms)
-        kibbles.extend(new_kibbles)
-        # Update world width after adding new content
-        world_width = max(world_width, last_platform_x + WINDOW_WIDTH * 2)
+    # No procedural generation - using fixed map instead
     
     # Check boundaries
     if player_x < 0:
