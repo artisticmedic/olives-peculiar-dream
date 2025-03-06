@@ -22,30 +22,42 @@ In "Olive's Peculiar Dream," you control a cat character who must navigate platf
 
 ## How to Run the Game
 
-### Option 1: Run on Replit
+### Option 1: Run Locally (Step-by-Step Instructions)
 
-1. Visit the Replit project page
-2. Click the "Run" button at the top of the page
+1. Download the game files:
+   - Go to [https://github.com/[your-username]/olive-peculiar-dream](https://github.com/[your-username]/olive-peculiar-dream)
+   - Click the green "Code" button
+   - Click "Download ZIP"
+   - Find the downloaded file on your computer and unzip it:
+     - On Windows: Right-click the ZIP file and select "Extract All"
+     - On Mac: Double-click the ZIP file
+
+2. Install Python:
+   - Go to [https://www.python.org/downloads/](https://www.python.org/downloads/)
+   - Download and install Python 3.10 or newer
+   - IMPORTANT: On Windows, check "Add Python to PATH" during installation
+
+3. Install Pygame:
+   - Open a command window:
+     - On Windows: Press Win+R, type "cmd" and press Enter
+     - On Mac: Open Spotlight (Cmd+Space), type "terminal" and press Enter
+   - Type this command and press Enter:
+     ```
+     pip install pygame
+     ```
+
+4. Start the game:
+   - Navigate to the game folder in your command window
+   - Run the game by typing:
+     ```
+     python main.py
+     ```
+
+### Option 2: Run on Replit (Easiest Method)
+
+1. Visit the Replit project page: [https://replit.com/@[username]/olive-peculiar-dream](https://replit.com/@[username]/olive-peculiar-dream)
+2. Click the green "Run" button at the top of the page
 3. The game will start automatically in the output window
-
-### Option 2: Run Locally
-
-1. Clone this repository:
-   ```
-   git clone https://github.com/[your-username]/olive-peculiar-dream.git
-   ```
-
-2. Make sure you have Python 3.10 or higher installed.
-
-3. Install required dependencies:
-   ```
-   pip install pygame
-   ```
-
-4. Run the game:
-   ```
-   python main.py
-   ```
 
 ## Game Objective
 
