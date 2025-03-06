@@ -318,33 +318,31 @@ while True:
         for drop in rain_drops:
             drop.draw(DISPLAYSURF)
     
-    # Draw rain toggle button
+    # Draw rain toggle button with text
+    # Make the button wider to accommodate text
+    rain_toggle_rect = pygame.Rect(20, 20, 100, 40)
     pygame.draw.rect(DISPLAYSURF, (40, 40, 60), rain_toggle_rect, border_radius=10)
     pygame.draw.rect(DISPLAYSURF, (100, 100, 120), rain_toggle_rect, width=2, border_radius=10)
     
-    # Draw toggle status indicator
-    toggle_status_rect = pygame.Rect(
-        rain_toggle_rect.x + 5,
-        rain_toggle_rect.y + 5,
-        rain_toggle_rect.width - 10,
-        rain_toggle_rect.height - 10
-    )
-    
+    # Create text for the toggle
+    toggle_font = pygame.font.Font(None, 24)
     if rain_enabled:
-        # Draw toggle as ON (filled)
-        pygame.draw.rect(DISPLAYSURF, (100, 200, 255), toggle_status_rect, border_radius=8)
-        rain_icon_color = (20, 20, 40)
+        toggle_text = "Rain: ON"
+        toggle_bg_color = (100, 200, 255)
+        toggle_text_color = (20, 20, 80)
     else:
-        # Draw toggle as OFF (empty)
-        pygame.draw.rect(DISPLAYSURF, (40, 40, 60), toggle_status_rect, border_radius=8)
-        rain_icon_color = (180, 180, 220)
+        toggle_text = "Rain: OFF"
+        toggle_bg_color = (60, 60, 80)
+        toggle_text_color = (200, 200, 220)
     
-    # Draw rain icon (simplified for toggle button)
-    for i in range(3):
-        start_x = rain_toggle_rect.x + 10 + i * 10
-        start_y = rain_toggle_rect.y + 10
-        end_y = rain_toggle_rect.y + rain_toggle_rect.height - 10
-        pygame.draw.line(DISPLAYSURF, rain_icon_color, (start_x, start_y), (start_x, end_y), 2)
+    # Draw toggle background with color based on state
+    pygame.draw.rect(DISPLAYSURF, toggle_bg_color, rain_toggle_rect, border_radius=10)
+    pygame.draw.rect(DISPLAYSURF, (100, 100, 120), rain_toggle_rect, width=2, border_radius=10)
+    
+    # Draw toggle text
+    text_surface = toggle_font.render(toggle_text, True, toggle_text_color)
+    text_rect = text_surface.get_rect(center=rain_toggle_rect.center)
+    DISPLAYSURF.blit(text_surface, text_rect)
     
     # Draw platforms with a more skeuomorphic look
     for platform in platforms:
