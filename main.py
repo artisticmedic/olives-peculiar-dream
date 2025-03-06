@@ -577,8 +577,15 @@ while True:
         
         # Draw Olive cat images as decorative elements around the container
         current_time = pygame.time.get_ticks()
-        # Load the olive cat image once
-        olive_cat_img = load_olive_cat_image()
+        
+        # Create olive cat image with proper caching
+        if not hasattr(celebration_active, 'olive_cat_img'):
+            celebration_active.olive_cat_img = load_olive_cat_image()
+        olive_cat_img = celebration_active.olive_cat_img
+        
+        # Initialize cache if not exists
+        if not hasattr(celebration_active, 'img_cache'):
+            celebration_active.img_cache = {}
         
         for i in range(12):
             angle = (i * 30 + current_time // 50) % 360
@@ -594,18 +601,14 @@ while True:
             scale = scales[scale_index]
             
             # Use a cache for rotated images to avoid expensive transforms
-            # Simple caching mechanism - 12 angles (30 degree increments) x 3 scales = 36 images max
+            # Round rotation to nearest 10 degrees to reduce cache size
             cache_key = f"{rotation//10}_{scale_index}"
             
-            # Create the cache if it doesn't exist
-            if not hasattr(load_olive_cat_image, 'cache'):
-                load_olive_cat_image.cache = {}
-                
-            if cache_key not in load_olive_cat_image.cache:
+            if cache_key not in celebration_active.img_cache:
                 rotated_cat = pygame.transform.rotozoom(olive_cat_img, rotation, scale)
-                load_olive_cat_image.cache[cache_key] = rotated_cat
+                celebration_active.img_cache[cache_key] = rotated_cat
             else:
-                rotated_cat = load_olive_cat_image.cache[cache_key]
+                rotated_cat = celebration_active.img_cache[cache_key]
                 
             rect = rotated_cat.get_rect(center=(x, y))
             
