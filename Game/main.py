@@ -5,8 +5,8 @@ import random
 import os
 import math
 from pygame.locals import *
-from Assets.cat_image import load_cat_image
-from Assets.olive_cat import load_olive_cat_image
+from Game.Assets.cat_image import load_cat_image
+from Game.Assets.olive_cat import load_olive_cat_image
 
 # Initialize pygame with optimized settings
 pygame.init()
