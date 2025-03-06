@@ -6,6 +6,7 @@ import os
 import math
 from pygame.locals import *
 from attached_assets.cat_image import load_cat_image
+from attached_assets.olive_cat import load_olive_cat_image
 
 # Initialize pygame
 pygame.init()
@@ -364,26 +365,40 @@ while True:
                         (container_x + container_width - 5, container_y + container_height - 5), 
                         3)
         
-        # Draw paw prints as decorative elements around the container
+        # Draw Olive cat images as decorative elements around the container
         current_time = pygame.time.get_ticks()
+        # Load the olive cat image once
+        olive_cat_img = load_olive_cat_image()
+        
         for i in range(12):
             angle = (i * 30 + current_time // 50) % 360
             radius = 250
             x = WINDOW_WIDTH // 2 + int(radius * math.cos(angle * 0.0174533))
             y = WINDOW_HEIGHT // 2 + int(radius * math.sin(angle * 0.0174533))
-            size = 8 + (i % 8)
             
-            # Create rainbow colors that change over time
+            # Create rotating Olive images with rainbow effects
+            rotation = (angle + current_time // 20) % 360
+            scale = 0.7 + 0.3 * abs(math.sin(current_time * 0.001 + i * 0.5))
+            size = int(40 * scale)
+            
+            # Rotate and scale the Olive image
+            rotated_cat = pygame.transform.rotozoom(olive_cat_img, rotation, scale)
+            rect = rotated_cat.get_rect(center=(x, y))
+            
+            # Apply a rainbow color filter
             hue = (i * 30 + current_time // 30) % 360
             r = int(abs(math.sin(hue * 0.0174533)) * 255)
             g = int(abs(math.sin((hue + 120) * 0.0174533)) * 255)
             b = int(abs(math.sin((hue + 240) * 0.0174533)) * 255)
             
-            # Draw a paw print shape
-            pygame.draw.circle(DISPLAYSURF, (r, g, b), (x, y), size)
-            pygame.draw.circle(DISPLAYSURF, (r, g, b), (x + size, y - size), size * 0.6)
-            pygame.draw.circle(DISPLAYSURF, (r, g, b), (x - size, y - size), size * 0.6)
-            pygame.draw.circle(DISPLAYSURF, (r, g, b), (x, y + size * 1.5), size * 0.8)
+            # Apply a colored tint to the image
+            tinted_cat = rotated_cat.copy()
+            tint = pygame.Surface(tinted_cat.get_size(), pygame.SRCALPHA)
+            tint.fill((r, g, b, 50))  # Semi-transparent tint
+            tinted_cat.blit(tint, (0, 0), special_flags=pygame.BLEND_RGBA_ADD)
+            
+            # Draw the tinted, rotated Olive cat
+            DISPLAYSURF.blit(tinted_cat, rect)
         
         # Display thank you message with a more elegant style
         font = pygame.font.Font(None, 42)
@@ -391,9 +406,9 @@ while True:
         
         lines = [
             "Ariel,",
-            "thank you so much for being",
-            "an incredible team member",
-            "and working with me."
+            "thank you for being an incredible",
+            "team member (and for bringing",
+            "Olive to all of our meetings)."
         ]
         
         for i, line in enumerate(lines):
@@ -428,35 +443,86 @@ while True:
             button_height
         )
         
-        # Draw buttons with skeuomorphic style
-        for button, text in [(restart_button, "Restart"), (confetti_button, "Confetti!")]:
-            # Button base
-            pygame.draw.rect(DISPLAYSURF, (100, 149, 237), button, border_radius=10)
-            
-            # Button highlight (top and left)
-            pygame.draw.line(DISPLAYSURF, (150, 180, 255), 
-                            (button.x + 3, button.y + 3),
-                            (button.x + button.width - 3, button.y + 3), 
-                            2)
-            pygame.draw.line(DISPLAYSURF, (150, 180, 255), 
-                            (button.x + 3, button.y + 3),
-                            (button.x + 3, button.y + button.height - 3), 
-                            2)
-            
-            # Button shadow (bottom and right)
-            pygame.draw.line(DISPLAYSURF, (70, 100, 180), 
-                            (button.x + 3, button.y + button.height - 3),
-                            (button.x + button.width - 3, button.y + button.height - 3), 
-                            2)
-            pygame.draw.line(DISPLAYSURF, (70, 100, 180), 
-                            (button.x + button.width - 3, button.y + 3),
-                            (button.x + button.width - 3, button.y + button.height - 3), 
-                            2)
-            
-            # Button text
-            text_surf = button_font.render(text, True, WHITE)
-            text_rect = text_surf.get_rect(center=button.center)
-            DISPLAYSURF.blit(text_surf, text_rect)
+        # Draw Restart button (black with white text)
+        pygame.draw.rect(DISPLAYSURF, BLACK, restart_button, border_radius=10)
+        
+        # Button highlight for restart button
+        pygame.draw.line(DISPLAYSURF, (50, 50, 50), 
+                        (restart_button.x + 3, restart_button.y + 3),
+                        (restart_button.x + restart_button.width - 3, restart_button.y + 3), 
+                        2)
+        pygame.draw.line(DISPLAYSURF, (50, 50, 50), 
+                        (restart_button.x + 3, restart_button.y + 3),
+                        (restart_button.x + 3, restart_button.y + restart_button.height - 3), 
+                        2)
+        
+        # Button shadow for restart button
+        pygame.draw.line(DISPLAYSURF, (20, 20, 20), 
+                        (restart_button.x + 3, restart_button.y + restart_button.height - 3),
+                        (restart_button.x + restart_button.width - 3, restart_button.y + restart_button.height - 3), 
+                        2)
+        pygame.draw.line(DISPLAYSURF, (20, 20, 20), 
+                        (restart_button.x + restart_button.width - 3, restart_button.y + 3),
+                        (restart_button.x + restart_button.width - 3, restart_button.y + restart_button.height - 3), 
+                        2)
+        
+        # Restart button text (white)
+        restart_text = button_font.render("Restart", True, WHITE)
+        restart_text_rect = restart_text.get_rect(center=restart_button.center)
+        DISPLAYSURF.blit(restart_text, restart_text_rect)
+        
+        # Draw Confetti button with multi-color animation
+        current_time = pygame.time.get_ticks()
+        confetti_button_base = pygame.Surface((button_width, button_height), pygame.SRCALPHA)
+        
+        # Create gradient background for confetti button
+        for i in range(button_width):
+            hue = (i * 2 + current_time // 20) % 360
+            r = int(abs(math.sin(hue * 0.0174533)) * 255)
+            g = int(abs(math.sin((hue + 120) * 0.0174533)) * 255)
+            b = int(abs(math.sin((hue + 240) * 0.0174533)) * 255)
+            pygame.draw.line(confetti_button_base, (r, g, b), 
+                            (i, 0), (i, button_height))
+        
+        # Add some animated "confetti" to the button background
+        for _ in range(10):
+            x = (current_time // 50 + random.randint(0, button_width)) % button_width
+            y = (current_time // 70 + random.randint(0, button_height)) % button_height
+            size = random.randint(2, 5)
+            hue = (x + y + current_time // 10) % 360
+            r = int(abs(math.sin(hue * 0.0174533)) * 255)
+            g = int(abs(math.sin((hue + 120) * 0.0174533)) * 255)
+            b = int(abs(math.sin((hue + 240) * 0.0174533)) * 255)
+            pygame.draw.rect(confetti_button_base, (r, g, b), 
+                            (x, y, size, size))
+        
+        # Apply button base to screen
+        DISPLAYSURF.blit(confetti_button_base, confetti_button)
+        
+        # Add button border
+        pygame.draw.rect(DISPLAYSURF, WHITE, confetti_button, width=2, border_radius=10)
+        
+        # Create animated confetti button text
+        confetti_text_base = pygame.Surface((button_width - 20, button_height - 20), pygame.SRCALPHA)
+        confetti_text = button_font.render("Confetti!", True, WHITE)
+        
+        # Make text "bounce" slightly
+        bounce_offset = int(math.sin(current_time * 0.01) * 3)
+        confetti_text_rect = confetti_text.get_rect(
+            center=(confetti_button.width // 2, confetti_button.height // 2 + bounce_offset)
+        )
+        
+        # Apply drop shadow to text
+        shadow_text = button_font.render("Confetti!", True, (0, 0, 0))
+        shadow_rect = shadow_text.get_rect(center=(confetti_text_rect.centerx + 2, confetti_text_rect.centery + 2))
+        confetti_text_base.blit(shadow_text, shadow_rect)
+        
+        # Apply main text
+        confetti_text_base.blit(confetti_text, confetti_text_rect)
+        
+        # Apply text to button
+        DISPLAYSURF.blit(confetti_text_base, 
+                        (confetti_button.x + 10, confetti_button.y + 10))
         
         # Check for button clicks
         mouse_pos = pygame.mouse.get_pos()
