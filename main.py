@@ -1,3 +1,4 @@
+
 import pygame
 import sys
 import random
@@ -53,12 +54,12 @@ class RainDrop:
         ])
         self.length = random.randint(5, 15)
         self.thickness = random.randint(1, 3)
-
+        
     def update(self):
         self.y += self.speed
         if self.y > WINDOW_HEIGHT:
             self.reset()
-
+            
     def draw(self, surface):
         pygame.draw.line(
             surface, 
@@ -67,7 +68,7 @@ class RainDrop:
             (self.x, self.y + self.length), 
             self.thickness
         )
-
+            
     def reset(self):
         self.x = random.randint(0, WINDOW_WIDTH)
         self.y = random.randint(-100, -10)
@@ -120,13 +121,13 @@ def create_cat_sprites():
     pygame.draw.ellipse(cat_sprites["idle"], BLUE, (5, 0, 15, 15))  # Head
     pygame.draw.ellipse(cat_sprites["idle"], BLUE, (20, 0, 15, 15))  # Head
     pygame.draw.ellipse(cat_sprites["idle"], (200, 200, 200), (0, player_height-10, 10, 10))  # Tail
-
+    
     # Running cat (slight variation)
     pygame.draw.ellipse(cat_sprites["run"], BLUE, (0, 12, player_width, player_height-12))  # Body
     pygame.draw.ellipse(cat_sprites["run"], BLUE, (7, 2, 15, 15))  # Head
     pygame.draw.ellipse(cat_sprites["run"], BLUE, (22, 2, 15, 15))  # Head
     pygame.draw.ellipse(cat_sprites["run"], (200, 200, 200), (5, player_height-10, 10, 10))  # Tail
-
+    
     # Jumping cat
     pygame.draw.ellipse(cat_sprites["jump"], BLUE, (0, 5, player_width, player_height-5))  # Body
     pygame.draw.ellipse(cat_sprites["jump"], BLUE, (5, 0, 15, 10))  # Head
@@ -186,18 +187,18 @@ class Confetti:
         self.rotation_speed = random.uniform(-5, 5)
         self.gravity = random.uniform(0.1, 0.3)
         self.lifetime = 100 + random.randint(0, 100)
-
+        
     def update(self):
         self.x += self.speed_x
         self.y += self.speed_y
         self.speed_y += self.gravity
         self.rotation += self.rotation_speed
         self.lifetime -= 1
-
+        
     def draw(self, surface):
         if self.lifetime <= 0:
             return False
-
+            
         # Create a rotated rectangle for the confetti
         confetti_surf = pygame.Surface((self.size, self.size), pygame.SRCALPHA)
         pygame.draw.rect(confetti_surf, self.color, (0, 0, self.size, self.size))
@@ -218,15 +219,15 @@ while True:
         if event.type == QUIT:
             pygame.quit()
             sys.exit()
-
+        
         # Mouse click events
         if event.type == MOUSEBUTTONDOWN and event.button == 1:  # Left mouse button
             mouse_pos = pygame.mouse.get_pos()
-
+            
             # Check if rain toggle button was clicked
             if rain_toggle_rect.collidepoint(mouse_pos):
                 rain_enabled = not rain_enabled
-
+        
         # Key press events
         if event.type == KEYDOWN:
             if event.key == K_LEFT:
@@ -239,7 +240,7 @@ while True:
                 player_vel_y = player_jump
                 is_jumping = True
                 current_sprite = "jump"
-
+        
         # Key release events
         if event.type == KEYUP:
             if event.key == K_LEFT and player_vel_x < 0:
@@ -248,23 +249,23 @@ while True:
             if event.key == K_RIGHT and player_vel_x > 0:
                 player_vel_x = 0
                 current_sprite = "idle"
-
+    
     # Update player position
     player_x += player_vel_x
     player_y += player_vel_y
-
+    
     # Apply gravity
     player_vel_y += gravity
-
+    
     # Update parallax effect based on player movement
     if player_vel_x != 0:
         parallax_offset += player_vel_x * 0.1
         parallax_offset %= WINDOW_WIDTH
-
+    
     # Update rain drops
     for drop in rain_drops:
         drop.update()
-
+    
     # Check kibble collection
     for kibble in kibbles:
         if (not kibble["collected"] and
@@ -278,11 +279,11 @@ while True:
             kibble_message["active"] = True
             kibble_message["text"] = random.choice(kibble_messages)
             kibble_message["timer"] = pygame.time.get_ticks()
-
+    
     # Update kibble message timing
     if kibble_message["active"] and pygame.time.get_ticks() - kibble_message["timer"] > kibble_message["duration"]:
         kibble_message["active"] = False
-
+    
     # Check collision with platforms
     is_jumping = True
     for platform in platforms:
@@ -297,7 +298,7 @@ while True:
             is_jumping = False
             if current_sprite == "jump":
                 current_sprite = "idle"
-
+    
     # Check boundaries
     if player_x < 0:
         player_x = 0
@@ -309,7 +310,7 @@ while True:
         is_jumping = False
         if current_sprite == "jump":
             current_sprite = "idle"
-
+    
     # Check trophy collection
     if (not trophy["collected"] and 
         player_x + player_width > trophy["x"] and
@@ -326,33 +327,33 @@ while True:
                 random.randint(0, WINDOW_HEIGHT // 2),
                 100
             )
-
+    
     # Draw everything
     DISPLAYSURF.fill(GRAY)
-
+    
     # Draw parallax cat background
     if cat_image:
         # Draw the cat image in two positions for seamless scrolling
         DISPLAYSURF.blit(cat_image, (-parallax_offset, 0))
         DISPLAYSURF.blit(cat_image, (WINDOW_WIDTH - parallax_offset, 0))
-
+        
         # Apply a semi-transparent overlay for better visibility
         overlay = pygame.Surface((WINDOW_WIDTH, WINDOW_HEIGHT))
         overlay.fill(GRAY)
         overlay.set_alpha(100)
         DISPLAYSURF.blit(overlay, (0, 0))
-
+    
     # Draw digital rain effect if enabled
     if rain_enabled:
         for drop in rain_drops:
             drop.draw(DISPLAYSURF)
-
+    
     # Draw rain toggle button with text
     # Make the button wider to accommodate text
     rain_toggle_rect = pygame.Rect(20, 20, 100, 40)
     pygame.draw.rect(DISPLAYSURF, (40, 40, 60), rain_toggle_rect, border_radius=10)
     pygame.draw.rect(DISPLAYSURF, (100, 100, 120), rain_toggle_rect, width=2, border_radius=10)
-
+    
     # Create text for the toggle
     toggle_font = pygame.font.Font(None, 24)
     if rain_enabled:
@@ -363,31 +364,31 @@ while True:
         toggle_text = "Rain: OFF"
         toggle_bg_color = (60, 60, 80)
         toggle_text_color = (200, 200, 220)
-
+    
     # Draw toggle background with color based on state
     pygame.draw.rect(DISPLAYSURF, toggle_bg_color, rain_toggle_rect, border_radius=10)
     pygame.draw.rect(DISPLAYSURF, (100, 100, 120), rain_toggle_rect, width=2, border_radius=10)
-
+    
     # Draw toggle text
     text_surface = toggle_font.render(toggle_text, True, toggle_text_color)
     text_rect = text_surface.get_rect(center=rain_toggle_rect.center)
     DISPLAYSURF.blit(text_surface, text_rect)
-
+    
     # Draw kibble counter
     kibble_font = pygame.font.Font(None, 32)
     # Draw container background
     kibble_rect = pygame.Rect(WINDOW_WIDTH - 120, 20, 100, 40)
     pygame.draw.rect(DISPLAYSURF, (40, 40, 60), kibble_rect, border_radius=10)
     pygame.draw.rect(DISPLAYSURF, (100, 100, 120), kibble_rect, width=2, border_radius=10)
-
+    
     # Add a kibble icon
     pygame.draw.circle(DISPLAYSURF, (255, 160, 60), (WINDOW_WIDTH - 100, 40), 8)
     pygame.draw.circle(DISPLAYSURF, (200, 120, 40), (WINDOW_WIDTH - 100, 40), 8, width=1)
-
+    
     # Draw kibble count
     count_text = kibble_font.render(f"x {kibble_count}", True, (220, 220, 220))
     DISPLAYSURF.blit(count_text, (WINDOW_WIDTH - 80, 31))
-
+    
     # Draw platforms with a more skeuomorphic look
     for platform in platforms:
         # Draw platform with a 3D effect
@@ -401,7 +402,7 @@ while True:
         pygame.draw.line(DISPLAYSURF, (90, 150, 90), 
                          (platform["x"], platform["y"] + platform["height"]), 
                          (platform["x"] + platform["width"], platform["y"] + platform["height"]), 2)
-
+    
     # Draw kibbles
     for kibble in kibbles:
         if not kibble["collected"]:
@@ -411,28 +412,28 @@ while True:
             glow_surf = pygame.Surface((glow_radius*2, glow_radius*2), pygame.SRCALPHA)
             pygame.draw.circle(glow_surf, glow_color, (glow_radius, glow_radius), glow_radius)
             DISPLAYSURF.blit(glow_surf, (kibble["x"]-glow_radius, kibble["y"]-glow_radius))
-
+            
             # Main kibble
             pygame.draw.circle(DISPLAYSURF, kibble["color"], (kibble["x"], kibble["y"]), kibble["radius"])
             # Shine effect
             pygame.draw.circle(DISPLAYSURF, (255, 255, 200), 
                              (kibble["x"]-2, kibble["y"]-2), 2)
-
+    
     # Draw player as a cat sprite
     DISPLAYSURF.blit(cat_sprites[current_sprite], (player_x, player_y))
-
+    
     # Draw player speech bubble when collecting kibble
     if kibble_message["active"]:
         # Position above player
         bubble_x = player_x + player_width // 2 - 30
         bubble_y = player_y - 40
-
+        
         # Draw the speech bubble
         pygame.draw.ellipse(DISPLAYSURF, WHITE, 
                            (bubble_x, bubble_y, 60, 30))
         pygame.draw.ellipse(DISPLAYSURF, BLACK, 
                            (bubble_x, bubble_y, 60, 30), 2)
-
+        
         # Draw pointer to player
         pointer_points = [
             (bubble_x + 20, bubble_y + 30),
@@ -441,49 +442,78 @@ while True:
         ]
         pygame.draw.polygon(DISPLAYSURF, WHITE, pointer_points)
         pygame.draw.polygon(DISPLAYSURF, BLACK, pointer_points, 2)
-
+        
         # Draw text
         font = pygame.font.Font(None, 20)
         text_surface = font.render(kibble_message["text"], True, BLACK)
         text_rect = text_surface.get_rect(center=(bubble_x + 30, bubble_y + 15))
         DISPLAYSURF.blit(text_surface, text_rect)
-
-    # Draw trophy if not collected (as a mouse)
+    
+    # Draw trophy if not collected (as a cat toy)
     if not trophy["collected"]:
-        # Try to load mouse sprite from assets
-        mouse_path = os.path.join("attached_assets", "mouse-sprite.png")
-        if os.path.exists(mouse_path):
-            try:
-                mouse_sprite = pygame.image.load(mouse_path)
-                mouse_sprite = pygame.transform.scale(mouse_sprite, (trophy["width"], trophy["height"]))
-                DISPLAYSURF.blit(mouse_sprite, (trophy["x"], trophy["y"]))
-            except pygame.error:
-                # Fallback to drawn mouse if image fails to load
-                pygame.draw.ellipse(DISPLAYSURF, (150, 150, 150), 
-                                 (trophy["x"], trophy["y"], trophy["width"], trophy["height"] * 0.7))
-                # Ears
-                pygame.draw.circle(DISPLAYSURF, (150, 150, 150), 
-                                (trophy["x"] + 10, trophy["y"]), 8)
-                pygame.draw.circle(DISPLAYSURF, (150, 150, 150), 
-                                (trophy["x"] + trophy["width"] - 10, trophy["y"]), 8)
-                # Tail
-                pygame.draw.line(DISPLAYSURF, (150, 150, 150), 
-                              (trophy["x"] + trophy["width"] // 2, trophy["y"] + trophy["height"] * 0.7),
-                              (trophy["x"] + trophy["width"] // 2 + 15, trophy["y"] + trophy["height"]), 3)
-        else:
-            # Fallback to drawn mouse if image doesn't exist
-            pygame.draw.ellipse(DISPLAYSURF, (150, 150, 150), 
-                             (trophy["x"], trophy["y"], trophy["width"], trophy["height"] * 0.7))
-            # Ears
-            pygame.draw.circle(DISPLAYSURF, (150, 150, 150), 
-                            (trophy["x"] + 10, trophy["y"]), 8)
-            pygame.draw.circle(DISPLAYSURF, (150, 150, 150), 
-                            (trophy["x"] + trophy["width"] - 10, trophy["y"]), 8)
-            # Tail
-            pygame.draw.line(DISPLAYSURF, (150, 150, 150), 
-                          (trophy["x"] + trophy["width"] // 2, trophy["y"] + trophy["height"] * 0.7),
-                          (trophy["x"] + trophy["width"] // 2 + 15, trophy["y"] + trophy["height"]), 3)
-
+        # Draw a cat toy (mouse)
+        pygame.draw.ellipse(DISPLAYSURF, (150, 150, 150), 
+                           (trophy["x"], trophy["y"], trophy["width"], trophy["height"] * 0.7))
+        # Ears
+        pygame.draw.circle(DISPLAYSURF, (150, 150, 150), 
+                          (trophy["x"] + 10, trophy["y"]), 8)
+        pygame.draw.circle(DISPLAYSURF, (150, 150, 150), 
+                          (trophy["x"] + trophy["width"] - 10, trophy["y"]), 8)
+        # Tail
+        pygame.draw.line(DISPLAYSURF, (150, 150, 150), 
+                        (trophy["x"] + trophy["width"] // 2, trophy["y"] + trophy["height"] * 0.7),
+                        (trophy["x"] + trophy["width"] // 2 + 15, trophy["y"] + trophy["height"]), 3)
+                        
+        # Draw speech bubble for the mouse
+        if speech_bubble["active"]:
+            # Update speech bubble movement
+            current_time = pygame.time.get_ticks()
+            speech_bubble["offset_x"] = math.sin(current_time * 0.005) * 3
+            speech_bubble["offset_y"] = math.cos(current_time * 0.003) * 2
+            
+            # Position of speech bubble
+            bubble_x = trophy["x"] + trophy["width"] + 5 + speech_bubble["offset_x"]
+            bubble_y = trophy["y"] - 50 + speech_bubble["offset_y"]
+            
+            # Progress the text animation
+            if current_time - speech_bubble["timer"] > 100:  # Control character reveal speed
+                speech_bubble["timer"] = current_time
+                if speech_bubble["char_index"] < len(speech_bubble["text"]):
+                    speech_bubble["char_index"] += 1
+            
+            # Current text to display
+            current_text = speech_bubble["text"][:speech_bubble["char_index"]]
+            
+            if current_text:
+                # Draw the speech bubble
+                font = pygame.font.Font(None, 24)
+                text_surface = font.render(current_text, True, BLACK)
+                text_rect = text_surface.get_rect()
+                
+                # Make bubble size fit text
+                padding = 10
+                bubble_width = text_rect.width + padding * 2
+                bubble_height = text_rect.height + padding * 2
+                
+                # Draw bubble background
+                pygame.draw.ellipse(DISPLAYSURF, WHITE, 
+                                   (bubble_x, bubble_y, bubble_width, bubble_height))
+                pygame.draw.ellipse(DISPLAYSURF, BLACK, 
+                                   (bubble_x, bubble_y, bubble_width, bubble_height), 2)
+                
+                # Draw pointer to mouse
+                pointer_points = [
+                    (bubble_x + 10, bubble_y + bubble_height - 5),
+                    (bubble_x - 5, bubble_y + bubble_height + 10),
+                    (bubble_x + 20, bubble_y + bubble_height)
+                ]
+                pygame.draw.polygon(DISPLAYSURF, WHITE, pointer_points)
+                pygame.draw.polygon(DISPLAYSURF, BLACK, pointer_points, 2)
+                
+                # Draw text
+                DISPLAYSURF.blit(text_surface, 
+                              (bubble_x + padding, bubble_y + padding))
+    
     # Handle celebration
     if celebration_active:
         # Draw a darkened overlay for the alert effect
@@ -491,18 +521,18 @@ while True:
         overlay.fill(BLACK)
         overlay.set_alpha(150)
         DISPLAYSURF.blit(overlay, (0, 0))
-
+        
         # Create container for the celebration message
         container_width = 600
         container_height = 400
         container_x = (WINDOW_WIDTH - container_width) // 2
         container_y = (WINDOW_HEIGHT - container_height) // 2
-
+        
         # Draw container with a skeuomorphic look
         pygame.draw.rect(DISPLAYSURF, (80, 80, 100), 
                          (container_x, container_y, container_width, container_height), 
                          border_radius=20)
-
+        
         # Add a highlight effect at the top and left edges
         pygame.draw.line(DISPLAYSURF, (100, 100, 120), 
                         (container_x + 5, container_y + 5), 
@@ -512,7 +542,7 @@ while True:
                         (container_x + 5, container_y + 5), 
                         (container_x + 5, container_y + container_height - 5), 
                         3)
-
+        
         # Add a shadow effect at the bottom and right edges
         pygame.draw.line(DISPLAYSURF, (60, 60, 80), 
                         (container_x + 5, container_y + container_height - 5), 
@@ -522,69 +552,69 @@ while True:
                         (container_x + container_width - 5, container_y + 5), 
                         (container_x + container_width - 5, container_y + container_height - 5), 
                         3)
-
+        
         # Draw Olive cat images as decorative elements around the container
         current_time = pygame.time.get_ticks()
         # Load the olive cat image once
         olive_cat_img = load_olive_cat_image()
-
+        
         for i in range(12):
             angle = (i * 30 + current_time // 50) % 360
             radius = 250
             x = WINDOW_WIDTH // 2 + int(radius * math.cos(angle * 0.0174533))
             y = WINDOW_HEIGHT // 2 + int(radius * math.sin(angle * 0.0174533))
-
+            
             # Create rotating Olive images with rainbow effects
             rotation = (angle + current_time // 20) % 360
             scale = 0.7 + 0.3 * abs(math.sin(current_time * 0.001 + i * 0.5))
             size = int(40 * scale)
-
+            
             # Rotate and scale the Olive image
             rotated_cat = pygame.transform.rotozoom(olive_cat_img, rotation, scale)
             rect = rotated_cat.get_rect(center=(x, y))
-
+            
             # Apply a rainbow color filter
             hue = (i * 30 + current_time // 30) % 360
             r = int(abs(math.sin(hue * 0.0174533)) * 255)
             g = int(abs(math.sin((hue + 120) * 0.0174533)) * 255)
             b = int(abs(math.sin((hue + 240) * 0.0174533)) * 255)
-
+            
             # Apply a colored tint to the image
             tinted_cat = rotated_cat.copy()
             tint = pygame.Surface(tinted_cat.get_size(), pygame.SRCALPHA)
             tint.fill((r, g, b, 50))  # Semi-transparent tint
             tinted_cat.blit(tint, (0, 0), special_flags=pygame.BLEND_RGBA_ADD)
-
+            
             # Draw the tinted, rotated Olive cat
             DISPLAYSURF.blit(tinted_cat, rect)
-
+        
         # Display thank you message with a more elegant style
         font = pygame.font.Font(None, 42)
         shadow_offset = 2
-
+        
         lines = [
             "Ariel,",
             "thank you for being an incredible",
             "team member (and for bringing",
             "Olive to all of our meetings)."
         ]
-
+        
         for i, line in enumerate(lines):
             # Draw text shadow
             shadow_text = font.render(line, True, (30, 30, 30))
             shadow_rect = shadow_text.get_rect(center=(WINDOW_WIDTH // 2 + shadow_offset, container_y + 120 + i * 45 + shadow_offset))
             DISPLAYSURF.blit(shadow_text, shadow_rect)
-
+            
             # Draw text
             text = font.render(line, True, WHITE)
             text_rect = text.get_rect(center=(WINDOW_WIDTH // 2, container_y + 120 + i * 45))
             DISPLAYSURF.blit(text, text_rect)
-
+        
         # Draw buttons
         button_font = pygame.font.Font(None, 32)
         button_width = 180
         button_height = 50
-
+        
         # Restart button
         restart_button = pygame.Rect(
             container_x + container_width // 4 - button_width // 2,
@@ -592,7 +622,7 @@ while True:
             button_width,
             button_height
         )
-
+        
         # Confetti button
         confetti_button = pygame.Rect(
             container_x + container_width * 3 // 4 - button_width // 2,
@@ -600,10 +630,10 @@ while True:
             button_width,
             button_height
         )
-
+        
         # Draw Restart button (black with white text)
         pygame.draw.rect(DISPLAYSURF, BLACK, restart_button, border_radius=10)
-
+        
         # Button highlight for restart button
         pygame.draw.line(DISPLAYSURF, (50, 50, 50), 
                         (restart_button.x + 3, restart_button.y + 3),
@@ -611,9 +641,9 @@ while True:
                         2)
         pygame.draw.line(DISPLAYSURF, (50, 50, 50), 
                         (restart_button.x + 3, restart_button.y + 3),
-                        (restart_button.x + 3,container_y + restart_button.height - 3), 
+                        (restart_button.x + 3, restart_button.y + restart_button.height - 3), 
                         2)
-
+        
         # Button shadow for restart button
         pygame.draw.line(DISPLAYSURF, (20, 20, 20), 
                         (restart_button.x + 3, restart_button.y + restart_button.height - 3),
@@ -623,16 +653,16 @@ while True:
                         (restart_button.x + restart_button.width - 3, restart_button.y + 3),
                         (restart_button.x + restart_button.width - 3, restart_button.y + restart_button.height - 3), 
                         2)
-
+        
         # Restart button text (white)
         restart_text = button_font.render("Restart", True, WHITE)
         restart_text_rect = restart_text.get_rect(center=restart_button.center)
         DISPLAYSURF.blit(restart_text, restart_text_rect)
-
+        
         # Draw Confetti button with multi-color animation
         current_time = pygame.time.get_ticks()
         confetti_button_base = pygame.Surface((button_width, button_height), pygame.SRCALPHA)
-
+        
         # Create gradient background for confetti button
         for i in range(button_width):
             hue = (i * 2 + current_time // 20) % 360
@@ -641,7 +671,7 @@ while True:
             b = int(abs(math.sin((hue + 240) * 0.0174533)) * 255)
             pygame.draw.line(confetti_button_base, (r, g, b), 
                             (i, 0), (i, button_height))
-
+        
         # Add some animated "confetti" to the button background
         for _ in range(10):
             x = (current_time // 50 + random.randint(0, button_width)) % button_width
@@ -653,37 +683,37 @@ while True:
             b = int(abs(math.sin((hue + 240) * 0.0174533)) * 255)
             pygame.draw.rect(confetti_button_base, (r, g, b), 
                             (x, y, size, size))
-
+        
         # Apply button base to screen
         DISPLAYSURF.blit(confetti_button_base, confetti_button)
-
+        
         # Add button border
         pygame.draw.rect(DISPLAYSURF, WHITE, confetti_button, width=2, border_radius=10)
-
+        
         # Create animated confetti button text
         # Draw text directly on screen instead of on a separate surface for better positioning
         confetti_text = button_font.render("Confetti!", True, WHITE)
-
+        
         # Make text "bounce" slightly
         bounce_offset = int(math.sin(current_time * 0.01) * 3)
-
+        
         # Calculate exact center position of the button
         text_x = confetti_button.x + confetti_button.width // 2
         text_y = confetti_button.y + confetti_button.height // 2 + bounce_offset
-
+        
         # Apply drop shadow to text
         shadow_text = button_font.render("Confetti!", True, (0, 0, 0))
         shadow_rect = shadow_text.get_rect(center=(text_x + 2, text_y + 2))
         DISPLAYSURF.blit(shadow_text, shadow_rect)
-
+        
         # Apply main text
         confetti_text_rect = confetti_text.get_rect(center=(text_x, text_y))
         DISPLAYSURF.blit(confetti_text, confetti_text_rect)
-
+        
         # Check for button clicks
         mouse_pos = pygame.mouse.get_pos()
         mouse_clicked = pygame.mouse.get_pressed()[0]
-
+        
         if mouse_clicked:
             if restart_button.collidepoint(mouse_pos):
                 # Reset game
@@ -695,11 +725,11 @@ while True:
                 trophy["collected"] = False
                 celebration_active = False
                 confetti_particles.clear()
-
+            
             elif confetti_button.collidepoint(mouse_pos):
                 # Add confetti burst
                 add_confetti_burst(WINDOW_WIDTH // 2, WINDOW_HEIGHT // 2, 200)
-
+        
         # Auto-generate initial confetti when celebration starts
         if pygame.time.get_ticks() - celebration_time < 100:
             for i in range(5):
@@ -708,13 +738,13 @@ while True:
                     random.randint(0, WINDOW_HEIGHT // 3),
                     50
                 )
-
+    
         # Update and draw confetti particles
         for particle in confetti_particles[:]:
             particle.update()
             if not particle.draw(DISPLAYSURF):
                 confetti_particles.remove(particle)
-
+    
     # Update display
     pygame.display.update()
     clock.tick(FPS)
