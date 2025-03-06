@@ -690,58 +690,105 @@ while True:
             text_rect = text.get_rect(center=(WINDOW_WIDTH // 2, container_y + 120 + i * 45))
             DISPLAYSURF.blit(text, text_rect)
             
-        # Add sparkle effects around container corners
+        # Add sparkle effects at specific locations with clusters
         current_time = pygame.time.get_ticks()
         
-        # Define sparkle positions (corners of container)
-        sparkle_positions = [
-            (container_x + 20, container_y + 20),  # Top-left
-            (container_x + container_width - 20, container_y + 20),  # Top-right
-            (container_x + 20, container_y + container_height - 20),  # Bottom-left
-            (container_x + container_width - 20, container_y + container_height - 20),  # Bottom-right
-            # Add a few more random positions along the edges
-            (container_x + container_width // 2, container_y + 15),  # Top middle
-            (container_x + container_width // 2, container_y + container_height - 15),  # Bottom middle
-            (container_x + 15, container_y + container_height // 2),  # Left middle
-            (container_x + container_width - 15, container_y + container_height // 2)  # Right middle
+        # Define sparkle cluster positions (as requested: top-left, bottom-left, middle-right)
+        sparkle_clusters = [
+            # Top-left corner cluster
+            [(container_x + 20, container_y + 20), 
+             (container_x + 32, container_y + 15),
+             (container_x + 25, container_y + 32),
+             (container_x + 12, container_y + 28)],
+            
+            # Bottom-left corner cluster
+            [(container_x + 20, container_y + container_height - 20),
+             (container_x + 15, container_y + container_height - 35),
+             (container_x + 32, container_y + container_height - 28),
+             (container_x + 28, container_y + container_height - 12)],
+            
+            # Middle-right side cluster
+            [(container_x + container_width - 15, container_y + container_height // 2),
+             (container_x + container_width - 25, container_y + container_height // 2 - 12),
+             (container_x + container_width - 20, container_y + container_height // 2 + 15),
+             (container_x + container_width - 32, container_y + container_height // 2 + 5)]
         ]
         
-        # Draw sparkles with fade in/out effect
-        for pos in sparkle_positions:
-            # Calculate size and opacity based on time (pulsing effect)
-            time_factor = (current_time / 200 + sparkle_positions.index(pos) * 0.5) % 1.0
-            # Create sine wave between 0 and 1
-            fade = (math.sin(time_factor * 2 * math.pi) + 1) / 2
+        # Draw sparkle clusters with slow, gentle fade in/out effect
+        for cluster_idx, cluster in enumerate(sparkle_clusters):
+            # Each cluster has its own base phase offset for out-of-sync animation
+            cluster_phase = cluster_idx * 2.1  # Ensure clusters are out of sync
             
-            # Only draw visible sparkles
-            if fade > 0.1:
-                size = int(4 + fade * 4)  # Size between 4 and 8
-                alpha = int(fade * 255)  # Alpha between 0 and 255
+            # Process each sparkle in the cluster
+            for pos_idx, pos in enumerate(cluster):
+                # Individual sparkle phase offset within cluster
+                sparkle_phase = pos_idx * 0.7
                 
-                # Draw a simple sparkle shape
-                sparkle_surf = pygame.Surface((size * 4, size * 4), pygame.SRCALPHA)
+                # Calculate very slow fade cycle (4-6 seconds per cycle)
+                # Convert milliseconds to seconds, divide by cycle duration (4-6 seconds)
+                cycle_duration = 4 + (cluster_idx + pos_idx) % 3  # 4, 5, or 6 seconds
+                time_factor = (current_time / 1000 / cycle_duration + cluster_phase + sparkle_phase) % 1.0
                 
-                # Cross shape
-                pygame.draw.line(sparkle_surf, (255, 255, 200, alpha), 
-                                (size * 2, 0), (size * 2, size * 4), size // 2)
-                pygame.draw.line(sparkle_surf, (255, 255, 200, alpha), 
-                                (0, size * 2), (size * 4, size * 2), size // 2)
+                # Create gentle sine wave between 0 and 1 for fade effect
+                fade = (math.sin(time_factor * 2 * math.pi) + 1) / 2
                 
-                # X shape (diagonal lines)
-                pygame.draw.line(sparkle_surf, (255, 255, 255, alpha), 
-                                (size, size), (size * 3, size * 3), size // 2)
-                pygame.draw.line(sparkle_surf, (255, 255, 255, alpha), 
-                                (size * 3, size), (size, size * 3), size // 2)
+                # Size ratio based on position in cluster (maintain 1:3 ratio between sizes)
+                size_ratio = 1.0 - (pos_idx % 3) * 0.25  # Gives ratios of 1, 0.75, 0.5
                 
-                # Small center glow
-                pygame.draw.circle(sparkle_surf, (255, 255, 255, alpha), 
-                                  (size * 2, size * 2), size)
-                
-                # Apply rotation for twinkling effect
-                rot_angle = (current_time / 20 + sparkle_positions.index(pos) * 30) % 360
-                rotated_sparkle = pygame.transform.rotate(sparkle_surf, rot_angle)
-                sparkle_rect = rotated_sparkle.get_rect(center=pos)
-                DISPLAYSURF.blit(rotated_sparkle, sparkle_rect)
+                # Only draw visible sparkles
+                if fade > 0.05:  # Lower threshold to make fade more gradual
+                    base_size = 6 + pos_idx % 3  # Base sizes vary between sparkles
+                    size = int(base_size * size_ratio)  # Apply ratio
+                    alpha = int(fade * 200)  # Max alpha 200 for gentler appearance
+                    
+                    # Calculate color with gentle cycling
+                    hue = (current_time / 5000 + cluster_idx * 0.3 + pos_idx * 0.1) % 1.0  # Very slow color change
+                    
+                    # Convert HSV to RGB (simplified conversion)
+                    if hue < 1/6:
+                        r, g, b = 255, int(255 * 6 * hue), 0
+                    elif hue < 2/6:
+                        r, g, b = int(255 * (2 - 6 * hue)), 255, 0
+                    elif hue < 3/6:
+                        r, g, b = 0, 255, int(255 * 6 * (hue - 2/6))
+                    elif hue < 4/6:
+                        r, g, b = 0, int(255 * (4 - 6 * hue)), 255
+                    elif hue < 5/6:
+                        r, g, b = int(255 * 6 * (hue - 4/6)), 0, 255
+                    else:
+                        r, g, b = 255, 0, int(255 * (6 - 6 * hue))
+                    
+                    # Make colors more pastel by adding white
+                    pastel_factor = 0.7
+                    r = int(r * (1 - pastel_factor) + 255 * pastel_factor)
+                    g = int(g * (1 - pastel_factor) + 255 * pastel_factor)
+                    b = int(b * (1 - pastel_factor) + 255 * pastel_factor)
+                    
+                    # Draw a simple sparkle shape
+                    sparkle_surf = pygame.Surface((size * 4, size * 4), pygame.SRCALPHA)
+                    
+                    # Cross shape
+                    pygame.draw.line(sparkle_surf, (r, g, b, alpha), 
+                                    (size * 2, 0), (size * 2, size * 4), size // 2)
+                    pygame.draw.line(sparkle_surf, (r, g, b, alpha), 
+                                    (0, size * 2), (size * 4, size * 2), size // 2)
+                    
+                    # X shape (diagonal lines)
+                    pygame.draw.line(sparkle_surf, (r, g, b, alpha), 
+                                    (size, size), (size * 3, size * 3), size // 2)
+                    pygame.draw.line(sparkle_surf, (r, g, b, alpha), 
+                                    (size * 3, size), (size, size * 3), size // 2)
+                    
+                    # Small center glow with slightly brighter color
+                    center_color = (min(r + 50, 255), min(g + 50, 255), min(b + 50, 255), alpha)
+                    pygame.draw.circle(sparkle_surf, center_color, 
+                                      (size * 2, size * 2), size)
+                    
+                    # Apply very slow rotation for gentle twinkling effect
+                    rot_angle = (current_time / 50 + cluster_idx * 30 + pos_idx * 45) % 360
+                    rotated_sparkle = pygame.transform.rotate(sparkle_surf, rot_angle)
+                    sparkle_rect = rotated_sparkle.get_rect(center=pos)
+                    DISPLAYSURF.blit(rotated_sparkle, sparkle_rect)
         
         # Draw buttons
         button_font = pygame.font.Font(None, 32)
