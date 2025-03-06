@@ -1,3 +1,4 @@
+
 # Olive's Peculiar Dream
 
 A fun 2D platformer game created with Pygame featuring a cat on a quest to collect kibble and find a special toy.
@@ -19,6 +20,13 @@ In "Olive's Peculiar Dream," you control a cat character who must navigate platf
 - **Platforms**: Jump on these to navigate upward
 - **Mouse Toy**: Reach this at the top of the level to complete the game
 - **Digital Rain Effect**: Toggle this feature on/off for a different visual experience
+
+## Project Organization
+
+The code is organized into these main directories:
+- `Game/` - Contains the main game code
+- `Game/Assets/` - Contains all game assets and asset loading code
+- `run_game.py` - The main entry point to run the game
 
 ## How to Run the Game
 
@@ -50,7 +58,7 @@ In "Olive's Peculiar Dream," you control a cat character who must navigate platf
    - Navigate to the game folder in your command window
    - Run the game by typing:
      ```
-     python main.py
+     python run_game.py
      ```
 
 ### Option 2: Run on Replit (Easiest Method)
