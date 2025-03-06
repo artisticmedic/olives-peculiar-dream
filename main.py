@@ -15,7 +15,7 @@ pygame.init()
 WINDOW_WIDTH = 800
 WINDOW_HEIGHT = 600
 DISPLAYSURF = pygame.display.set_mode((WINDOW_WIDTH, WINDOW_HEIGHT), pygame.HWSURFACE | pygame.DOUBLEBUF)
-pygame.display.set_caption('Thank You Ariel!')
+pygame.display.set_caption('Olive\'s Peculiar Dream')
 pygame.event.set_allowed([pygame.QUIT, pygame.KEYDOWN, pygame.KEYUP, pygame.MOUSEBUTTONDOWN])  # Only process necessary events
 
 # Define colors
