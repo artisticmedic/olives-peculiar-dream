@@ -43,8 +43,7 @@ The code is organized into these main directories:
 2. Install Python:
    - Go to [https://www.python.org/downloads/](https://www.python.org/downloads/)
    - Download Python 3.10 or newer
-   - Open the downloaded folder, and open the file named "Install Certificates.command"
-   - IMPORTANT: On Windows, check "Add Python to PATH" during installation
+   - Open the downloaded folder, and open the file named "Install Certificates.command." 
 
 3. Install Pygame:
    - Open a command window:
@@ -54,24 +53,28 @@ The code is organized into these main directories:
      ```
      pip install pygame
      ```
-     If these returns an error, try running:
+     If this returns an error, try running:
      ```
      pip3 install pygame
      ```
 
 4. Prep the game:
    - Navigate to the game folder in your command window by...
-      - Right clicking the unzipped game folder
-      - While the menu is open, hold down the opt key, and select the "Copy olives-peculiar-dreamm as pathname" option
-      - In Terminal, type cd and then paste the path name and enter.
+      - Back in Finder, right click the unzipped game folder to open the context menu
+      - While the menu is open, hold down the opt key, and select "Copy olives-peculiar-dreamm as pathname"
+      - In Terminal, type cd, spacebar, and then paste the path name and enter.
         ```
-        cd the-pasted-path-name
+        cd the-pasted-path-name-exactly
         ```
+        This tells Terminal what folder to reference for future commands.
 5. Run the game by typing:
      ```
      python run_game.py
      ```
-     If you installed using pip3, you will need to use python3 instead of python
+     If you installed using pip3, you will need to use python3 instead of python:
+     ```
+     python3 run_game.py
+     ```
 
 ## Game Objective
 
