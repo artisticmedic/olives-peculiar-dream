@@ -42,7 +42,8 @@ The code is organized into these main directories:
 2. Install Python:
    - Go to [https://www.python.org/downloads/](https://www.python.org/downloads/)
    - Download Python 3.10 or newer
-   - Open the downloaded folder, and open the file named "Install Certificates.command." 
+   - Open the downloaded folder, and open the file named "Install Certificates.command."
+   - Once the command has run, close that window.
 
 3. Install Pygame:
    - Open a command window:
