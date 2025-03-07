@@ -33,8 +33,7 @@ The code is organized into these main directories:
 ### Local
 
 1. Download the game files:
-   - Go to [https://github.com/artisticmedic/olive-peculiar-dream](https://github.com/artisticmedic/olive-peculiar-dream)
-   - Click the green "Code" button
+   - At the top of this page, click the green "Code" button
    - Click "Download ZIP"
    - Find the downloaded file on your computer and unzip it:
      - On Windows: Right-click the ZIP file and select "Extract All"
