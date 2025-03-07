@@ -33,7 +33,7 @@ The code is organized into these main directories:
 ### Local
 
 1. Download the game files:
-   - Go to [https://github.com/[your-username]/olive-peculiar-dream](https://github.com/[your-username]/olive-peculiar-dream)
+   - Go to [https://github.com/artisticmedic/olive-peculiar-dream](https://github.com/artisticmedic/olive-peculiar-dream)
    - Click the green "Code" button
    - Click "Download ZIP"
    - Find the downloaded file on your computer and unzip it:
@@ -42,7 +42,8 @@ The code is organized into these main directories:
 
 2. Install Python:
    - Go to [https://www.python.org/downloads/](https://www.python.org/downloads/)
-   - Download and install Python 3.10 or newer
+   - Download Python 3.10 or newer
+   - Open the downloaded folder, and open the file named "Install Certificates.command"
    - IMPORTANT: On Windows, check "Add Python to PATH" during installation
 
 3. Install Pygame:
@@ -53,13 +54,24 @@ The code is organized into these main directories:
      ```
      pip install pygame
      ```
+     If these returns an error, try running:
+     ```
+     pip3 install pygame
+     ```
 
-4. Start the game:
-   - Navigate to the game folder in your command window
-   - Run the game by typing:
+4. Prep the game:
+   - Navigate to the game folder in your command window by...
+      - Right clicking the unzipped game folder
+      - While the menu is open, hold down the opt key, and select the "Copy olives-peculiar-dreamm as pathname" option
+      - In Terminal, type cd and then paste the path name and enter.
+        ```
+        cd the-pasted-path-name
+        ```
+5. Run the game by typing:
      ```
      python run_game.py
      ```
+     If you installed using pip3, you will need to use python3 instead of python
 
 ## Game Objective
 
